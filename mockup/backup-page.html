@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicer App - Backup Manager</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+        
+        .header {
+            grid-area: header;
+            background: #2a2a2a;
+            border-bottom: 2px solid #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #f4d03f;
+        }
+        
+        .logo-icon {
+            width: 20px;
+            height: 20px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 10px;
+        }
+        
+        .terminal-info {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .status-indicator {
+            color: #10b981;
+        }
+        
+        .sidebar {
+            grid-area: sidebar;
+            background: #2a2a2a;
+            border-right: 2px solid #3a3a3a;
+            padding: 20px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-title {
+            padding: 0 20px 8px;
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            color: #e5e5e5;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-size: 12px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: #3a3a3a;
+            border-left-color: #f4d03f;
+            color: #f4d03f;
+        }
+        
+        .main {
+            grid-area: main;
+            padding: 24px;
+            background: #1a1a1a;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .terminal-time {
+            font-size: 11px;
+            color: #999;
+            font-family: inherit;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        
+        .btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary:hover {
+            background: #e6c236;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: #1a1a1a;
+            border-color: #10b981;
+        }
+        
+        .btn-success:hover {
+            background: #0d9668;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .terminal-window {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .terminal-header {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .terminal-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+        }
+        
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #10b981; }
+        
+        .terminal-content {
+            padding: 20px;
+        }
+        
+        .backup-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 16px;
+            position: relative;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f4d03f;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f4d03f;
+            margin-bottom: 4px;
+        }
+        
+        .stat-meta {
+            font-size: 10px;
+            color: #10b981;
+        }
+        
+        .backup-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table-header {
+            background: #3a3a3a;
+            color: #f4d03f;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 10px;
+        }
+        
+        .table-header th {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .table-row {
+            border-bottom: 1px solid #3a3a3a;
+            transition: all 0.2s ease;
+        }
+        
+        .table-row:hover {
+            background: #3a3a3a;
+        }
+        
+        .table-row td {
+            padding: 12px 16px;
+            font-size: 11px;
+        }
+        
+        .backup-name {
+            color: #f4d03f;
+            font-weight: 600;
+        }
+        
+        .backup-size {
+            color: #e5e5e5;
+        }
+        
+        .backup-date {
+            color: #999;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-success {
+            background: #10b981;
+            color: #1a1a1a;
+        }
+        
+        .status-running {
+            background: #f59e0b;
+            color: #1a1a1a;
+        }
+        
+        .status-failed {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #f4d03f;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .command-line {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 24px;
+        }
+        
+        .prompt {
+            color: #f4d03f;
+        }
+        
+        .cursor {
+            background: #f4d03f;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas: 
+                    "header"
+                    "main";
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .backup-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .action-bar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-icon">IA</div>
+                    INVOICER_APP
+                </div>
+            </div>
+            
+            <div class="terminal-info">
+                <span>USER: admin</span>
+                <span>SESSION: <span id="session-time">14:32:07</span></span>
+                <span class="status-indicator">● ONLINE</span>
+            </div>
+        </header>
+        
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">// MAIN_MENU</div>
+                <a href="#" class="nav-item">► dashboard.exe</a>
+                <a href="#" class="nav-item">► invoices.db</a>
+                <a href="#" class="nav-item">► clients.json</a>
+                <a href="#" class="nav-item">► payments.log</a>
+                <a href="#" class="nav-item">► reports.sql</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// SYSTEM_TOOLS</div>
+                <a href="#" class="nav-item">► config.ini</a>
+                <a href="#" class="nav-item active">► backup.sh</a>
+                <a href="#" class="nav-item">► export.py</a>
+                <a href="#" class="nav-item">► analytics.r</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// ADMIN_PANEL</div>
+                <a href="#" class="nav-item">► users.admin</a>
+                <a href="#" class="nav-item">► security.cfg</a>
+                <a href="#" class="nav-item">► logs.txt</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="page-header">
+                <h1 class="page-title">BACKUP_MANAGER.SH</h1>
+                <div class="terminal-time" id="current-time">2024-01-18 15:42:33 UTC</div>
+            </div>
+
+            <div class="backup-stats">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL_BACKUPS</div>
+                    <div class="stat-value">47</div>
+                    <div class="stat-meta">last_30_days</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">STORAGE_USED</div>
+                    <div class="stat-value">12.4GB</div>
+                    <div class="stat-meta">of_50GB_available</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">SUCCESS_RATE</div>
+                    <div class="stat-value">98.7%</div>
+                    <div class="stat-meta">backup_reliability</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">LAST_BACKUP</div>
+                    <div class="stat-value">2h ago</div>
+                    <div class="stat-meta">auto_scheduled</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="createBackup()">CREATE_BACKUP</button>
+                <button class="btn btn-success">RESTORE_BACKUP</button>
+                <button class="btn">SCHEDULE_BACKUP</button>
+                <button class="btn">DOWNLOAD_BACKUP</button>
+                <button class="btn btn-danger">DELETE_OLD</button>
+            </div>
+
+            <!-- Current Backup Progress -->
+            <div class="terminal-window" id="backup-progress" style="display: none;">
+                <div class="terminal-header">
+                    <div class="terminal-title">BACKUP_PROGRESS.LOG</div>
+                    <div class="terminal-controls">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                </div>
+
+                <div class="terminal-content">
+                    <div style="margin-bottom: 16px;">
+                        <div style="color: #f4d03f; font-weight: 600; margin-bottom: 8px;">CREATING BACKUP: backup_2024-01-18_154233.tar.gz</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div style="font-size: 10px; color: #999; margin-top: 4px;">
+                            <span id="progress-text">Initializing backup process...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup History -->
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-title">BACKUP_HISTORY.LOG</div>
+                    <div class="terminal-controls">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                </div>
+
+                <div class="terminal-content">
+                    <table class="backup-table">
+                        <thead class="table-header">
+                            <tr>
+                                <th>BACKUP_NAME</th>
+                                <th>SIZE</th>
+                                <th>DATE_CREATED</th>
+                                <th>TYPE</th>
+                                <th>STATUS</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="backup-list">
+                            <tr class="table-row">
+                                <td class="backup-name">backup_2024-01-18_143000.tar.gz</td>
+                                <td class="backup-size">284.5 MB</td>
+                                <td class="backup-date">2024-01-18 14:30:00</td>
+                                <td>AUTO</td>
+                                <td><span class="status-badge status-success">SUCCESS</span></td>
+                                <td>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">RESTORE</button>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">DOWNLOAD</button>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="backup-name">backup_2024-01-18_120000.tar.gz</td>
+                                <td class="backup-size">281.2 MB</td>
+                                <td class="backup-date">2024-01-18 12:00:00</td>
+                                <td>AUTO</td>
+                                <td><span class="status-badge status-success">SUCCESS</span></td>
+                                <td>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">RESTORE</button>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">DOWNLOAD</button>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="backup-name">backup_2024-01-18_080000.tar.gz</td>
+                                <td class="backup-size">279.8 MB</td>
+                                <td class="backup-date">2024-01-18 08:00:00</td>
+                                <td>AUTO</td>
+                                <td><span class="status-badge status-success">SUCCESS</span></td>
+                                <td>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">RESTORE</button>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">DOWNLOAD</button>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="backup-name">backup_2024-01-17_200000.tar.gz</td>
+                                <td class="backup-size">276.4 MB</td>
+                                <td class="backup-date">2024-01-17 20:00:00</td>
+                                <td>MANUAL</td>
+                                <td><span class="status-badge status-success">SUCCESS</span></td>
+                                <td>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">RESTORE</button>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">DOWNLOAD</button>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="backup-name">backup_2024-01-17_160000.tar.gz</td>
+                                <td class="backup-size">--</td>
+                                <td class="backup-date">2024-01-17 16:00:00</td>
+                                <td>AUTO</td>
+                                <td><span class="status-badge status-failed">FAILED</span></td>
+                                <td>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">RETRY</button>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">LOGS</button>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="backup-name">backup_2024-01-17_120000.tar.gz</td>
+                                <td class="backup-size">274.1 MB</td>
+                                <td class="backup-date">2024-01-17 12:00:00</td>
+                                <td>AUTO</td>
+                                <td><span class="status-badge status-success">SUCCESS</span></td>
+                                <td>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">RESTORE</button>
+                                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">DOWNLOAD</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="command-line">
+                <span class="prompt">invoicer@app-terminal:~$</span> backup --list --recent=10
+                <br>
+                <span style="color: #10b981;">✓ Found 47 backup files, showing 10 most recent</span>
+                <br>
+                <span class="prompt">invoicer@app-terminal:~$</span> <span class="cursor">█</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update session time
+        function updateSessionTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const sessionElement = document.getElementById('session-time');
+            if (sessionElement) {
+                sessionElement.textContent = timeString;
+            }
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        // Create backup with progress simulation
+        function createBackup() {
+            const progressWindow = document.getElementById('backup-progress');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+
+            progressWindow.style.display = 'block';
+
+            const steps = [
+                { progress: 10, text: 'Preparing database export...' },
+                { progress: 25, text: 'Exporting invoice data...' },
+                { progress: 40, text: 'Backing up client information...' },
+                { progress: 55, text: 'Archiving payment records...' },
+                { progress: 70, text: 'Compressing backup files...' },
+                { progress: 85, text: 'Verifying backup integrity...' },
+                { progress: 100, text: 'Backup completed successfully!' }
+            ];
+
+            let currentStep = 0;
+
+            const updateProgress = () => {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    progressFill.style.width = step.progress + '%';
+                    progressText.textContent = step.text;
+                    currentStep++;
+
+                    setTimeout(updateProgress, 1000 + Math.random() * 1000);
+                } else {
+                    setTimeout(() => {
+                        progressWindow.style.display = 'none';
+                        addNewBackupToTable();
+                    }, 2000);
+                }
+            };
+
+            updateProgress();
+        }
+
+        // Add new backup to table
+        function addNewBackupToTable() {
+            const now = new Date();
+            const timestamp = now.toISOString().replace('T', '_').substring(0, 19).replace(/:/g, '');
+            const dateString = now.toISOString().replace('T', ' ').substring(0, 19);
+
+            const tbody = document.querySelector('#backup-list');
+            const newRow = document.createElement('tr');
+            newRow.className = 'table-row';
+            newRow.innerHTML = `
+                <td class="backup-name">backup_${timestamp}.tar.gz</td>
+                <td class="backup-size">287.3 MB</td>
+                <td class="backup-date">${dateString}</td>
+                <td>MANUAL</td>
+                <td><span class="status-badge status-success">SUCCESS</span></td>
+                <td>
+                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">RESTORE</button>
+                    <button class="btn" style="padding: 4px 8px; font-size: 9px;">DOWNLOAD</button>
+                </td>
+            `;
+
+            tbody.insertBefore(newRow, tbody.firstChild);
+
+            // Update command line
+            const commandLine = document.querySelector('.command-line');
+            const successMessage = document.createElement('div');
+            successMessage.innerHTML = `<span style="color: #10b981;">✓ Backup created: backup_${timestamp}.tar.gz</span>`;
+            commandLine.insertBefore(successMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                commandLine.removeChild(successMessage);
+            }, 5000);
+        }
+
+        // Simulate backup stats updates
+        function updateBackupStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                if (Math.random() < 0.1) {
+                    stat.style.color = '#3b82f6';
+                    setTimeout(() => {
+                        stat.style.color = '#f4d03f';
+                    }, 300);
+                }
+            });
+        }
+
+        setInterval(updateSessionTime, 1000);
+        setInterval(updateCurrentTime, 1000);
+        setInterval(updateBackupStats, 8000);
+
+        // Initialize
+        updateSessionTime();
+        updateCurrentTime();
+    </script>
+</body>
+</html>

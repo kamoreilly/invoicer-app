@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicer App - Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            line-height: 1.6;
+            font-size: 14px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 24px;
+            color: #f4d03f;
+            margin-bottom: 16px;
+        }
+        
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        
+        .login-subtitle {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+        
+        .version-info {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .terminal-window {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .terminal-header {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .terminal-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #999;
+        }
+        
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #10b981; }
+        
+        .terminal-content {
+            padding: 32px;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .form-input {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            padding: 12px 16px;
+            font-family: inherit;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #f4d03f;
+            box-shadow: 0 0 0 2px rgba(244, 208, 63, 0.2);
+        }
+        
+        .form-input::placeholder {
+            color: #666;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .checkbox:checked {
+            background: #f4d03f;
+            border-color: #f4d03f;
+        }
+        
+        .checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #1a1a1a;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .checkbox-label {
+            color: #999;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .forgot-link {
+            color: #f4d03f;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.2s ease;
+        }
+        
+        .forgot-link:hover {
+            color: #e6c236;
+        }
+        
+        .btn {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border: none;
+            padding: 14px 24px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            background: #e6c236;
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            background: #666;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .login-footer {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .footer-link {
+            color: #f4d03f;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .footer-link:hover {
+            color: #e6c236;
+        }
+        
+        .system-status {
+            background: #0f0f0f;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .status-title {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .status-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+        
+        .status-label {
+            color: #e5e5e5;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        
+        .status-online {
+            color: #10b981;
+        }
+        
+        .command-line {
+            background: #0f0f0f;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 24px;
+        }
+        
+        .prompt {
+            color: #f4d03f;
+        }
+        
+        .cursor {
+            background: #f4d03f;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 16px;
+        }
+        
+        .loading-text {
+            font-size: 11px;
+            color: #f59e0b;
+            margin-bottom: 8px;
+        }
+        
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: #3a3a3a;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loading-fill {
+            height: 100%;
+            background: #f4d03f;
+            border-radius: 2px;
+            animation: loading 2s ease-in-out infinite;
+        }
+        
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 16px;
+            }
+            
+            .terminal-content {
+                padding: 24px;
+            }
+            
+            .logo {
+                font-size: 20px;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <div class="logo-icon">IA</div>
+                INVOICER APP
+            </div>
+            <p class="login-subtitle">Open Source Invoice Management</p>
+            <p class="version-info">Version 2.1.4 • Local Installation</p>
+        </div>
+        
+        <div class="system-status">
+            <div class="status-title">System Status</div>
+            <div class="status-items">
+                <div class="status-item">
+                    <span class="status-label">Database Connection</span>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot"></div>
+                        ONLINE
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Web Server</span>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot"></div>
+                        RUNNING
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Local Storage</span>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot"></div>
+                        AVAILABLE
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-title">USER_AUTHENTICATION.LOGIN</div>
+                <div class="terminal-controls">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                </div>
+            </div>
+
+            <div class="terminal-content">
+                <form class="login-form" id="login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            class="form-input"
+                            placeholder="Enter your username"
+                            value="admin"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            class="form-input"
+                            placeholder="Enter your password"
+                            value="password123"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-options">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="remember" class="checkbox">
+                            <label for="remember" class="checkbox-label">Remember Me</label>
+                        </div>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn" id="login-btn">
+                        Login to Dashboard
+                    </button>
+
+                    <div class="loading" id="loading">
+                        <div class="loading-text">Authenticating user...</div>
+                        <div class="loading-bar">
+                            <div class="loading-fill"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="login-footer">
+            <p>
+                First time setup? <a href="#" class="footer-link">Run Setup Wizard</a><br>
+                Need help? <a href="#" class="footer-link">View Documentation</a><br>
+                <a href="landing-page.html" class="footer-link">← Back to Landing Page</a>
+            </p>
+        </div>
+
+        <div class="command-line">
+            <span class="prompt">invoicer@localhost:~$</span> auth --status
+            <br>
+            <span style="color: #10b981;">✓ Authentication service ready. Please enter credentials.</span>
+            <br>
+            <span class="prompt">invoicer@localhost:~$</span> <span class="cursor">█</span>
+        </div>
+    </div>
+
+    <script>
+        // Login form handling
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const loading = document.getElementById('loading');
+            const commandLine = document.querySelector('.command-line');
+
+            // Disable form
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Authenticating...';
+            loading.style.display = 'block';
+
+            // Add command to terminal
+            const loginCommand = document.createElement('div');
+            loginCommand.innerHTML = `<span class="prompt">invoicer@localhost:~$</span> auth --login --user="${username}"`;
+            commandLine.insertBefore(loginCommand, commandLine.lastElementChild);
+
+            // Simulate authentication process
+            setTimeout(() => {
+                const authResponse = document.createElement('div');
+                authResponse.innerHTML = '<span style="color: #f59e0b;">⚡ Verifying credentials...</span>';
+                commandLine.insertBefore(authResponse, commandLine.lastElementChild);
+
+                setTimeout(() => {
+                    if (username === 'admin' && password === 'password123') {
+                        authResponse.innerHTML = '<span style="color: #10b981;">✓ Authentication successful. Redirecting to dashboard...</span>';
+
+                        setTimeout(() => {
+                            // Redirect to dashboard
+                            window.location.href = 'html-5.html';
+                        }, 1500);
+                    } else {
+                        authResponse.innerHTML = '<span style="color: #ef4444;">✗ Authentication failed. Invalid credentials.</span>';
+
+                        // Re-enable form
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Login to Dashboard';
+                        loading.style.display = 'none';
+
+                        // Shake animation for error
+                        document.querySelector('.terminal-window').style.animation = 'shake 0.5s ease-in-out';
+                        setTimeout(() => {
+                            document.querySelector('.terminal-window').style.animation = '';
+                        }, 500);
+                    }
+
+                    // Clean up command line after 5 seconds
+                    setTimeout(() => {
+                        commandLine.removeChild(loginCommand);
+                        commandLine.removeChild(authResponse);
+                    }, 5000);
+                }, 2000);
+            }, 1000);
+        });
+
+        // Demo credentials hint
+        function showDemoHint() {
+            const commandLine = document.querySelector('.command-line');
+            const hintMessage = document.createElement('div');
+            hintMessage.innerHTML = '<span style="color: #f59e0b;">💡 Demo credentials: admin / password123</span>';
+            commandLine.insertBefore(hintMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                commandLine.removeChild(hintMessage);
+            }, 8000);
+        }
+
+        // Show demo hint after 3 seconds
+        setTimeout(showDemoHint, 3000);
+
+        // System status animation
+        function animateStatus() {
+            const statusDots = document.querySelectorAll('.status-dot');
+            statusDots.forEach((dot, index) => {
+                setTimeout(() => {
+                    dot.style.boxShadow = '0 0 8px #10b981';
+                    setTimeout(() => {
+                        dot.style.boxShadow = 'none';
+                    }, 300);
+                }, index * 200);
+            });
+        }
+
+        // Animate status every 10 seconds
+        setInterval(animateStatus, 10000);
+
+        // Focus username field on load
+        document.getElementById('username').focus();
+
+        // Add shake animation for errors
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

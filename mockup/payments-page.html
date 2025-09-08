@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicer App - Payment Tracker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+        
+        .header {
+            grid-area: header;
+            background: #2a2a2a;
+            border-bottom: 2px solid #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #f4d03f;
+        }
+        
+        .logo-icon {
+            width: 20px;
+            height: 20px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 10px;
+        }
+        
+        .terminal-info {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .status-indicator {
+            color: #10b981;
+        }
+        
+        .sidebar {
+            grid-area: sidebar;
+            background: #2a2a2a;
+            border-right: 2px solid #3a3a3a;
+            padding: 20px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-title {
+            padding: 0 20px 8px;
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            color: #e5e5e5;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-size: 12px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: #3a3a3a;
+            border-left-color: #f4d03f;
+            color: #f4d03f;
+        }
+        
+        .main {
+            grid-area: main;
+            padding: 24px;
+            background: #1a1a1a;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .terminal-time {
+            font-size: 11px;
+            color: #999;
+            font-family: inherit;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        
+        .btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary:hover {
+            background: #e6c236;
+        }
+        
+        .filter-select {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 11px;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+        
+        .terminal-window {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .terminal-header {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .terminal-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+        }
+        
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #10b981; }
+        
+        .terminal-content {
+            padding: 0;
+        }
+        
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table-header {
+            background: #3a3a3a;
+            color: #f4d03f;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 10px;
+        }
+        
+        .table-header th {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .table-row {
+            border-bottom: 1px solid #3a3a3a;
+            transition: all 0.2s ease;
+        }
+        
+        .table-row:hover {
+            background: #3a3a3a;
+        }
+        
+        .table-row td {
+            padding: 12px 16px;
+            font-size: 11px;
+        }
+        
+        .payment-id {
+            color: #f4d03f;
+            font-weight: 600;
+        }
+        
+        .invoice-ref {
+            color: #e5e5e5;
+        }
+        
+        .client-name {
+            color: #999;
+        }
+        
+        .payment-amount {
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .payment-method {
+            color: #e5e5e5;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-completed {
+            background: #10b981;
+            color: #1a1a1a;
+        }
+        
+        .status-pending {
+            background: #f59e0b;
+            color: #1a1a1a;
+        }
+        
+        .status-failed {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        
+        .status-refunded {
+            background: #999;
+            color: #1a1a1a;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 16px;
+            position: relative;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f4d03f;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f4d03f;
+            margin-bottom: 4px;
+        }
+        
+        .stat-meta {
+            font-size: 10px;
+            color: #10b981;
+        }
+        
+        .command-line {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 24px;
+        }
+        
+        .prompt {
+            color: #f4d03f;
+        }
+        
+        .cursor {
+            background: #f4d03f;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas: 
+                    "header"
+                    "main";
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .action-bar {
+                flex-wrap: wrap;
+            }
+            
+            .filter-select {
+                margin-left: 0;
+                margin-top: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-icon">IA</div>
+                    INVOICER_APP
+                </div>
+            </div>
+            
+            <div class="terminal-info">
+                <span>USER: admin</span>
+                <span>SESSION: <span id="session-time">14:32:07</span></span>
+                <span class="status-indicator">● ONLINE</span>
+            </div>
+        </header>
+        
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">// MAIN_MENU</div>
+                <a href="#" class="nav-item">► dashboard.exe</a>
+                <a href="#" class="nav-item">► invoices.db</a>
+                <a href="#" class="nav-item">► clients.json</a>
+                <a href="#" class="nav-item active">► payments.log</a>
+                <a href="#" class="nav-item">► reports.sql</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// SYSTEM_TOOLS</div>
+                <a href="#" class="nav-item">► config.ini</a>
+                <a href="#" class="nav-item">► backup.sh</a>
+                <a href="#" class="nav-item">► export.py</a>
+                <a href="#" class="nav-item">► analytics.r</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// ADMIN_PANEL</div>
+                <a href="#" class="nav-item">► users.admin</a>
+                <a href="#" class="nav-item">► security.cfg</a>
+                <a href="#" class="nav-item">► logs.txt</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="page-header">
+                <h1 class="page-title">PAYMENT_TRACKER.LOG</h1>
+                <div class="terminal-time" id="current-time">2024-01-18 15:42:33 UTC</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL_PAYMENTS</div>
+                    <div class="stat-value">1,847</div>
+                    <div class="stat-meta">+89 this_month</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">PAYMENTS_RECEIVED</div>
+                    <div class="stat-value">$567,890</div>
+                    <div class="stat-meta">this_month</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">PENDING_PAYMENTS</div>
+                    <div class="stat-value">$89,450</div>
+                    <div class="stat-meta">47 transactions</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">FAILED_PAYMENTS</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-meta">$4,230 amount</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary">+ RECORD_PAYMENT</button>
+                <button class="btn">RECONCILE</button>
+                <button class="btn">EXPORT_REPORT</button>
+                <button class="btn">SEND_REMINDERS</button>
+                <select class="filter-select" id="payment-filter">
+                    <option value="all">ALL_PAYMENTS</option>
+                    <option value="completed">COMPLETED</option>
+                    <option value="pending">PENDING</option>
+                    <option value="failed">FAILED</option>
+                    <option value="refunded">REFUNDED</option>
+                </select>
+            </div>
+
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-title">PAYMENT_TRANSACTIONS.DB</div>
+                    <div class="terminal-controls">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                </div>
+
+                <div class="terminal-content">
+                    <table class="payments-table">
+                        <thead class="table-header">
+                            <tr>
+                                <th>PAYMENT_ID</th>
+                                <th>INVOICE_REF</th>
+                                <th>CLIENT</th>
+                                <th>AMOUNT</th>
+                                <th>METHOD</th>
+                                <th>STATUS</th>
+                                <th>DATE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-list">
+                            <tr class="table-row">
+                                <td class="payment-id">PAY-2024-0234</td>
+                                <td class="invoice-ref">INV-2024-0891</td>
+                                <td class="client-name">TechFlow Solutions</td>
+                                <td class="payment-amount">$15,750.00</td>
+                                <td class="payment-method">BANK_TRANSFER</td>
+                                <td><span class="status-badge status-completed">COMPLETED</span></td>
+                                <td>2024-01-18</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="payment-id">PAY-2024-0235</td>
+                                <td class="invoice-ref">INV-2024-0892</td>
+                                <td class="client-name">Digital Ventures</td>
+                                <td class="payment-amount">$8,920.00</td>
+                                <td class="payment-method">CREDIT_CARD</td>
+                                <td><span class="status-badge status-pending">PENDING</span></td>
+                                <td>2024-01-17</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="payment-id">PAY-2024-0236</td>
+                                <td class="invoice-ref">INV-2024-0893</td>
+                                <td class="client-name">Global Dynamics</td>
+                                <td class="payment-amount">$24,500.00</td>
+                                <td class="payment-method">ACH_TRANSFER</td>
+                                <td><span class="status-badge status-failed">FAILED</span></td>
+                                <td>2024-01-16</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="payment-id">PAY-2024-0237</td>
+                                <td class="invoice-ref">INV-2024-0894</td>
+                                <td class="client-name">Innovation Labs</td>
+                                <td class="payment-amount">$6,780.00</td>
+                                <td class="payment-method">PAYPAL</td>
+                                <td><span class="status-badge status-completed">COMPLETED</span></td>
+                                <td>2024-01-15</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="payment-id">PAY-2024-0238</td>
+                                <td class="invoice-ref">INV-2024-0895</td>
+                                <td class="client-name">Future Systems</td>
+                                <td class="payment-amount">$31,200.00</td>
+                                <td class="payment-method">WIRE_TRANSFER</td>
+                                <td><span class="status-badge status-pending">PENDING</span></td>
+                                <td>2024-01-14</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="payment-id">PAY-2024-0239</td>
+                                <td class="invoice-ref">INV-2024-0896</td>
+                                <td class="client-name">StartupXYZ</td>
+                                <td class="payment-amount">$2,450.00</td>
+                                <td class="payment-method">CHECK</td>
+                                <td><span class="status-badge status-refunded">REFUNDED</span></td>
+                                <td>2024-01-13</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="payment-id">PAY-2024-0240</td>
+                                <td class="invoice-ref">INV-2024-0897</td>
+                                <td class="client-name">MegaCorp Industries</td>
+                                <td class="payment-amount">$45,890.00</td>
+                                <td class="payment-method">BANK_TRANSFER</td>
+                                <td><span class="status-badge status-completed">COMPLETED</span></td>
+                                <td>2024-01-12</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="command-line">
+                <span class="prompt">invoicer@app-terminal:~$</span> payment --list --status=all --sort=date_desc
+                <br>
+                <span style="color: #10b981;">✓ Retrieved 1,847 payment records</span>
+                <br>
+                <span class="prompt">invoicer@app-terminal:~$</span> <span class="cursor">█</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update session time
+        function updateSessionTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const sessionElement = document.getElementById('session-time');
+            if (sessionElement) {
+                sessionElement.textContent = timeString;
+            }
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        // Filter payments by status
+        document.getElementById('payment-filter').addEventListener('change', function(e) {
+            const filterValue = e.target.value;
+            const rows = document.querySelectorAll('#payments-list .table-row');
+
+            rows.forEach(row => {
+                const statusBadge = row.querySelector('.status-badge');
+                const status = statusBadge.textContent.toLowerCase();
+
+                if (filterValue === 'all' || status === filterValue) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update command line
+            const commandLine = document.querySelector('.command-line');
+            const filterMessage = document.createElement('div');
+            filterMessage.innerHTML = `<span style="color: #f4d03f;">► Filter applied: ${filterValue.toUpperCase()}</span>`;
+            commandLine.insertBefore(filterMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                commandLine.removeChild(filterMessage);
+            }, 3000);
+        });
+
+        // Simulate real-time payment updates
+        function updatePaymentStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                if (Math.random() < 0.08) {
+                    stat.style.color = '#3b82f6';
+                    setTimeout(() => {
+                        stat.style.color = '#f4d03f';
+                    }, 300);
+                }
+            });
+        }
+
+        // Simulate new payment notifications
+        function simulatePaymentNotification() {
+            if (Math.random() < 0.1) { // 10% chance
+                const commandLine = document.querySelector('.command-line');
+                const notification = document.createElement('div');
+                notification.innerHTML = '<span style="color: #10b981;">🔔 New payment received: $2,450.00 from TechFlow Solutions</span>';
+                commandLine.insertBefore(notification, commandLine.lastElementChild);
+
+                setTimeout(() => {
+                    commandLine.removeChild(notification);
+                }, 5000);
+            }
+        }
+
+        setInterval(updateSessionTime, 1000);
+        setInterval(updateCurrentTime, 1000);
+        setInterval(updatePaymentStats, 3000);
+        setInterval(simulatePaymentNotification, 15000);
+
+        // Initialize
+        updateSessionTime();
+        updateCurrentTime();
+    </script>
+</body>
+</html>

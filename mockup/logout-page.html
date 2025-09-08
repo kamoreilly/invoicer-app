@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicer App - Session Logout</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+        
+        .header {
+            grid-area: header;
+            background: #2a2a2a;
+            border-bottom: 2px solid #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #f4d03f;
+        }
+        
+        .logo-icon {
+            width: 20px;
+            height: 20px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 10px;
+        }
+        
+        .terminal-info {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .status-indicator {
+            color: #10b981;
+        }
+        
+        .sidebar {
+            grid-area: sidebar;
+            background: #2a2a2a;
+            border-right: 2px solid #3a3a3a;
+            padding: 20px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-title {
+            padding: 0 20px 8px;
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            color: #e5e5e5;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-size: 12px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: #3a3a3a;
+            border-left-color: #f4d03f;
+            color: #f4d03f;
+        }
+        
+        .main {
+            grid-area: main;
+            padding: 24px;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logout-container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 32px;
+        }
+        
+        .terminal-window {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+        
+        .terminal-header {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .terminal-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+        }
+        
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #10b981; }
+        
+        .terminal-content {
+            padding: 32px;
+        }
+        
+        .session-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+        
+        .info-group {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 16px;
+        }
+        
+        .info-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: #f4d03f;
+            font-weight: 600;
+        }
+        
+        .logout-message {
+            font-size: 16px;
+            color: #e5e5e5;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        
+        .logout-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+        
+        .btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 12px 24px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 120px;
+        }
+        
+        .btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary:hover {
+            background: #e6c236;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .security-notice {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .notice-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .notice-text {
+            font-size: 11px;
+            color: #999;
+            line-height: 1.5;
+        }
+        
+        .command-line {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: #10b981;
+            text-align: left;
+        }
+        
+        .prompt {
+            color: #f4d03f;
+        }
+        
+        .cursor {
+            background: #f4d03f;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .logout-progress {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #f4d03f;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas: 
+                    "header"
+                    "main";
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .session-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .logout-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .main {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-icon">IA</div>
+                    INVOICER_APP
+                </div>
+            </div>
+            
+            <div class="terminal-info">
+                <span>USER: admin</span>
+                <span>SESSION: <span id="session-time">14:32:07</span></span>
+                <span class="status-indicator">● ONLINE</span>
+            </div>
+        </header>
+        
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">// MAIN_MENU</div>
+                <a href="#" class="nav-item">► dashboard.exe</a>
+                <a href="#" class="nav-item">► invoices.db</a>
+                <a href="#" class="nav-item">► clients.json</a>
+                <a href="#" class="nav-item">► payments.log</a>
+                <a href="#" class="nav-item">► reports.sql</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// SYSTEM_TOOLS</div>
+                <a href="#" class="nav-item">► config.ini</a>
+                <a href="#" class="nav-item">► backup.sh</a>
+                <a href="#" class="nav-item">► export.py</a>
+                <a href="#" class="nav-item">► analytics.r</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// ADMIN_PANEL</div>
+                <a href="#" class="nav-item">► users.admin</a>
+                <a href="#" class="nav-item active">► logout.cfg</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="logout-container">
+                <h1 class="page-title">SESSION_LOGOUT.CFG</h1>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-title">SESSION_MANAGER.CFG</div>
+                        <div class="terminal-controls">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div>
+                        </div>
+                    </div>
+
+                    <div class="terminal-content">
+                        <div class="session-info">
+                            <div class="info-group">
+                                <div class="info-label">CURRENT_USER</div>
+                                <div class="info-value">admin</div>
+                            </div>
+
+                            <div class="info-group">
+                                <div class="info-label">SESSION_DURATION</div>
+                                <div class="info-value" id="session-duration">2h 14m 33s</div>
+                            </div>
+
+                            <div class="info-group">
+                                <div class="info-label">LOGIN_TIME</div>
+                                <div class="info-value">2024-01-18 12:28:00</div>
+                            </div>
+
+                            <div class="info-group">
+                                <div class="info-label">IP_ADDRESS</div>
+                                <div class="info-value">192.168.1.100</div>
+                            </div>
+                        </div>
+
+                        <div class="logout-message">
+                            Are you sure you want to end your current session?<br>
+                            All unsaved changes will be lost and you will be redirected to the login page.
+                        </div>
+
+                        <div class="logout-actions">
+                            <button class="btn" onclick="cancelLogout()">CANCEL</button>
+                            <button class="btn btn-primary" onclick="saveAndLogout()">SAVE_&_LOGOUT</button>
+                            <button class="btn btn-danger" onclick="forceLogout()">FORCE_LOGOUT</button>
+                        </div>
+
+                        <div class="logout-progress" id="logout-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="progress-text" id="progress-text">Saving session data...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="security-notice">
+                    <div class="notice-title">SECURITY_NOTICE</div>
+                    <div class="notice-text">
+                        For security purposes, your session will automatically expire after 8 hours of inactivity.
+                        Always log out when using shared or public computers. Your session data is encrypted
+                        and stored securely according to our privacy policy.
+                    </div>
+                </div>
+
+                <div class="command-line">
+                    <span class="prompt">invoicer@app-terminal:~$</span> session --status --user=admin
+                    <br>
+                    <span style="color: #10b981;">✓ Session active. Ready for logout procedure.</span>
+                    <br>
+                    <span class="prompt">invoicer@app-terminal:~$</span> <span class="cursor">█</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let sessionStartTime = new Date(Date.now() - (2 * 60 * 60 * 1000) - (14 * 60 * 1000) - (33 * 1000)); // 2h 14m 33s ago
+
+        // Update session time
+        function updateSessionTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const sessionElement = document.getElementById('session-time');
+            if (sessionElement) {
+                sessionElement.textContent = timeString;
+            }
+        }
+
+        // Update session duration
+        function updateSessionDuration() {
+            const now = new Date();
+            const duration = now - sessionStartTime;
+
+            const hours = Math.floor(duration / (1000 * 60 * 60));
+            const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((duration % (1000 * 60)) / 1000);
+
+            const durationString = `${hours}h ${minutes}m ${seconds}s`;
+            const durationElement = document.getElementById('session-duration');
+            if (durationElement) {
+                durationElement.textContent = durationString;
+            }
+        }
+
+        // Cancel logout
+        function cancelLogout() {
+            const commandLine = document.querySelector('.command-line');
+            const cancelMessage = document.createElement('div');
+            cancelMessage.innerHTML = '<span style="color: #f59e0b;">► Logout cancelled. Returning to dashboard...</span>';
+            commandLine.insertBefore(cancelMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                commandLine.removeChild(cancelMessage);
+                // Simulate redirect
+                window.history.back();
+            }, 2000);
+        }
+
+        // Save and logout
+        function saveAndLogout() {
+            const progressContainer = document.getElementById('logout-progress');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+
+            progressContainer.style.display = 'block';
+
+            const steps = [
+                { progress: 20, text: 'Saving session data...' },
+                { progress: 40, text: 'Backing up user preferences...' },
+                { progress: 60, text: 'Clearing temporary files...' },
+                { progress: 80, text: 'Updating activity logs...' },
+                { progress: 100, text: 'Logout complete. Redirecting...' }
+            ];
+
+            let currentStep = 0;
+
+            const updateProgress = () => {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    progressFill.style.width = step.progress + '%';
+                    progressText.textContent = step.text;
+                    currentStep++;
+
+                    setTimeout(updateProgress, 800);
+                } else {
+                    setTimeout(() => {
+                        alert('Logout successful! You will be redirected to the login page.');
+                    }, 1000);
+                }
+            };
+
+            updateProgress();
+        }
+
+        // Force logout
+        function forceLogout() {
+            const commandLine = document.querySelector('.command-line');
+            const forceMessage = document.createElement('div');
+            forceMessage.innerHTML = '<span style="color: #ef4444;">⚠ Force logout initiated. Session terminated immediately.</span>';
+            commandLine.insertBefore(forceMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                alert('Force logout complete! You will be redirected to the login page.');
+            }, 2000);
+        }
+
+        // Update command line with logout commands
+        function updateCommandLine() {
+            const commands = [
+                'session --check-activity',
+                'logout --prepare',
+                'session --save-state',
+                'logout --status'
+            ];
+
+            if (Math.random() < 0.1) {
+                const commandLine = document.querySelector('.command-line');
+                const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+                const commandMessage = document.createElement('div');
+                commandMessage.innerHTML = `<span class="prompt">invoicer@app-terminal:~$</span> ${randomCommand}`;
+                commandLine.insertBefore(commandMessage, commandLine.lastElementChild);
+
+                setTimeout(() => {
+                    const responseMessage = document.createElement('div');
+                    responseMessage.innerHTML = '<span style="color: #10b981;">✓ Command executed successfully.</span>';
+                    commandLine.insertBefore(responseMessage, commandLine.lastElementChild);
+
+                    setTimeout(() => {
+                        commandLine.removeChild(commandMessage);
+                        commandLine.removeChild(responseMessage);
+                    }, 3000);
+                }, 1000);
+            }
+        }
+
+        setInterval(updateSessionTime, 1000);
+        setInterval(updateSessionDuration, 1000);
+        setInterval(updateCommandLine, 10000);
+
+        // Initialize
+        updateSessionTime();
+        updateSessionDuration();
+
+        // Auto-logout warning (simulate)
+        setTimeout(() => {
+            const commandLine = document.querySelector('.command-line');
+            const warningMessage = document.createElement('div');
+            warningMessage.innerHTML = '<span style="color: #f59e0b;">⚠ Session will expire in 30 minutes due to inactivity.</span>';
+            commandLine.insertBefore(warningMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                commandLine.removeChild(warningMessage);
+            }, 8000);
+        }, 15000);
+    </script>
+</body>
+</html>

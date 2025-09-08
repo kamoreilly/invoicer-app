@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicer App - Invoice Database</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+        
+        .header {
+            grid-area: header;
+            background: #2a2a2a;
+            border-bottom: 2px solid #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #f4d03f;
+        }
+        
+        .logo-icon {
+            width: 20px;
+            height: 20px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 10px;
+        }
+        
+        .terminal-info {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .status-indicator {
+            color: #10b981;
+        }
+        
+        .sidebar {
+            grid-area: sidebar;
+            background: #2a2a2a;
+            border-right: 2px solid #3a3a3a;
+            padding: 20px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-title {
+            padding: 0 20px 8px;
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            color: #e5e5e5;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-size: 12px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: #3a3a3a;
+            border-left-color: #f4d03f;
+            color: #f4d03f;
+        }
+        
+        .main {
+            grid-area: main;
+            padding: 24px;
+            background: #1a1a1a;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .terminal-time {
+            font-size: 11px;
+            color: #999;
+            font-family: inherit;
+        }
+        
+        .invoice-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 16px;
+            position: relative;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f4d03f;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f4d03f;
+            margin-bottom: 4px;
+        }
+        
+        .stat-meta {
+            font-size: 10px;
+            color: #10b981;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary:hover {
+            background: #e6c236;
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-left: auto;
+        }
+        
+        .search-input {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 11px;
+            border-radius: 4px;
+            width: 200px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #f4d03f;
+            box-shadow: 0 0 0 1px #f4d03f;
+        }
+        
+        .filter-select {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 11px;
+            border-radius: 4px;
+        }
+        
+        .terminal-window {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .terminal-header {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .terminal-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+        }
+        
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #10b981; }
+        
+        .terminal-content {
+            padding: 0;
+        }
+        
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table-header {
+            background: #3a3a3a;
+            color: #f4d03f;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 10px;
+        }
+        
+        .table-header th {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .table-row {
+            border-bottom: 1px solid #3a3a3a;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .table-row:hover {
+            background: #3a3a3a;
+        }
+        
+        .table-row.selected {
+            background: #2a2a2a;
+            border-left: 3px solid #f4d03f;
+        }
+        
+        .table-row td {
+            padding: 12px 16px;
+            font-size: 11px;
+        }
+        
+        .invoice-number {
+            color: #f4d03f;
+            font-weight: 600;
+        }
+        
+        .client-name {
+            color: #e5e5e5;
+            font-weight: 500;
+        }
+        
+        .invoice-amount {
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .invoice-date {
+            color: #999;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-draft {
+            background: #6b7280;
+            color: #ffffff;
+        }
+        
+        .status-sent {
+            background: #3b82f6;
+            color: #ffffff;
+        }
+        
+        .status-paid {
+            background: #10b981;
+            color: #1a1a1a;
+        }
+        
+        .status-overdue {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        
+        .status-partial {
+            background: #f59e0b;
+            color: #1a1a1a;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .action-btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 4px 8px;
+            font-family: inherit;
+            font-size: 9px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        
+        .action-btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .command-line {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 24px;
+        }
+        
+        .prompt {
+            color: #f4d03f;
+        }
+        
+        .cursor {
+            background: #f4d03f;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas: 
+                    "header"
+                    "main";
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .invoice-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-filter {
+                margin-left: 0;
+                margin-top: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-icon">IA</div>
+                    INVOICER_APP
+                </div>
+            </div>
+            
+            <div class="terminal-info">
+                <span>USER: admin</span>
+                <span>SESSION: <span id="session-time">14:32:07</span></span>
+                <span class="status-indicator">● ONLINE</span>
+            </div>
+        </header>
+        
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">// MAIN_MENU</div>
+                <a href="#" class="nav-item">► dashboard.exe</a>
+                <a href="#" class="nav-item active">► invoices.db</a>
+                <a href="#" class="nav-item">► clients.json</a>
+                <a href="#" class="nav-item">► payments.log</a>
+                <a href="#" class="nav-item">► reports.sql</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// SYSTEM_TOOLS</div>
+                <a href="#" class="nav-item">► config.ini</a>
+                <a href="#" class="nav-item">► backup.sh</a>
+                <a href="#" class="nav-item">► export.py</a>
+                <a href="#" class="nav-item">► analytics.r</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// ADMIN_PANEL</div>
+                <a href="#" class="nav-item">► users.admin</a>
+                <a href="#" class="nav-item">► logout.cfg</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="page-header">
+                <h1 class="page-title">INVOICE_DATABASE.DB</h1>
+                <div class="terminal-time" id="current-time">2024-01-18 15:42:33 UTC</div>
+            </div>
+
+            <div class="invoice-stats">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL_INVOICES</div>
+                    <div class="stat-value">247</div>
+                    <div class="stat-meta">this_month: +23</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL_VALUE</div>
+                    <div class="stat-value">$127,450</div>
+                    <div class="stat-meta">outstanding: $23,120</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">PAID_INVOICES</div>
+                    <div class="stat-value">189</div>
+                    <div class="stat-meta">76.5%_collection_rate</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">OVERDUE_INVOICES</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-meta">$8,340_overdue</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="createInvoice()">NEW_INVOICE</button>
+                <button class="btn">BULK_SEND</button>
+                <button class="btn">EXPORT_LIST</button>
+                <button class="btn">PAYMENT_REMINDER</button>
+
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="Search invoices..." id="search-input">
+                    <select class="filter-select" id="status-filter">
+                        <option value="all">ALL_STATUS</option>
+                        <option value="draft">DRAFT</option>
+                        <option value="sent">SENT</option>
+                        <option value="paid">PAID</option>
+                        <option value="overdue">OVERDUE</option>
+                        <option value="partial">PARTIAL</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Invoice List -->
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-title">INVOICE_RECORDS.SQL</div>
+                    <div class="terminal-controls">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                </div>
+
+                <div class="terminal-content">
+                    <table class="invoice-table">
+                        <thead class="table-header">
+                            <tr>
+                                <th>INVOICE_ID</th>
+                                <th>CLIENT</th>
+                                <th>AMOUNT</th>
+                                <th>ISSUE_DATE</th>
+                                <th>DUE_DATE</th>
+                                <th>STATUS</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-list">
+                            <tr class="table-row" onclick="selectInvoice(this)">
+                                <td class="invoice-number">INV-2024-001</td>
+                                <td class="client-name">TechCorp Solutions</td>
+                                <td class="invoice-amount">$4,250.00</td>
+                                <td class="invoice-date">2024-01-15</td>
+                                <td class="invoice-date">2024-02-14</td>
+                                <td><span class="status-badge status-sent">SENT</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">VIEW</button>
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">SEND</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectInvoice(this)">
+                                <td class="invoice-number">INV-2024-002</td>
+                                <td class="client-name">Digital Dynamics</td>
+                                <td class="invoice-amount">$2,800.00</td>
+                                <td class="invoice-date">2024-01-16</td>
+                                <td class="invoice-date">2024-02-15</td>
+                                <td><span class="status-badge status-paid">PAID</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">VIEW</button>
+                                        <button class="action-btn">RECEIPT</button>
+                                        <button class="action-btn">COPY</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectInvoice(this)">
+                                <td class="invoice-number">INV-2024-003</td>
+                                <td class="client-name">StartupHub Inc</td>
+                                <td class="invoice-amount">$1,950.00</td>
+                                <td class="invoice-date">2024-01-17</td>
+                                <td class="invoice-date">2024-02-16</td>
+                                <td><span class="status-badge status-draft">DRAFT</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">SEND</button>
+                                        <button class="action-btn">DELETE</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectInvoice(this)">
+                                <td class="invoice-number">INV-2024-004</td>
+                                <td class="client-name">Enterprise Systems</td>
+                                <td class="invoice-amount">$6,750.00</td>
+                                <td class="invoice-date">2024-01-10</td>
+                                <td class="invoice-date">2024-02-09</td>
+                                <td><span class="status-badge status-overdue">OVERDUE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">VIEW</button>
+                                        <button class="action-btn">REMIND</button>
+                                        <button class="action-btn">CALL</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectInvoice(this)">
+                                <td class="invoice-number">INV-2024-005</td>
+                                <td class="client-name">Creative Agency</td>
+                                <td class="invoice-amount">$3,200.00</td>
+                                <td class="invoice-date">2024-01-12</td>
+                                <td class="invoice-date">2024-02-11</td>
+                                <td><span class="status-badge status-partial">PARTIAL</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">VIEW</button>
+                                        <button class="action-btn">BALANCE</button>
+                                        <button class="action-btn">REMIND</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectInvoice(this)">
+                                <td class="invoice-number">INV-2024-006</td>
+                                <td class="client-name">Global Consulting</td>
+                                <td class="invoice-amount">$5,500.00</td>
+                                <td class="invoice-date">2024-01-14</td>
+                                <td class="invoice-date">2024-02-13</td>
+                                <td><span class="status-badge status-sent">SENT</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">VIEW</button>
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">REMIND</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectInvoice(this)">
+                                <td class="invoice-number">INV-2024-007</td>
+                                <td class="client-name">Innovation Labs</td>
+                                <td class="invoice-amount">$2,100.00</td>
+                                <td class="invoice-date">2024-01-18</td>
+                                <td class="invoice-date">2024-02-17</td>
+                                <td><span class="status-badge status-draft">DRAFT</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">SEND</button>
+                                        <button class="action-btn">PREVIEW</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectInvoice(this)">
+                                <td class="invoice-number">INV-2024-008</td>
+                                <td class="client-name">Metro Solutions</td>
+                                <td class="invoice-amount">$4,800.00</td>
+                                <td class="invoice-date">2024-01-11</td>
+                                <td class="invoice-date">2024-02-10</td>
+                                <td><span class="status-badge status-paid">PAID</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">VIEW</button>
+                                        <button class="action-btn">RECEIPT</button>
+                                        <button class="action-btn">COPY</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="command-line">
+                <span class="prompt">invoicer@app-terminal:~$</span> SELECT * FROM invoices ORDER BY issue_date DESC LIMIT 50;
+                <br>
+                <span style="color: #10b981;">✓ Query executed successfully. 247 total records found.</span>
+                <br>
+                <span class="prompt">invoicer@app-terminal:~$</span> <span class="cursor">█</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update session time
+        function updateSessionTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const sessionElement = document.getElementById('session-time');
+            if (sessionElement) {
+                sessionElement.textContent = timeString;
+            }
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        // Select invoice row
+        function selectInvoice(row) {
+            // Remove previous selection
+            document.querySelectorAll('.table-row').forEach(r => r.classList.remove('selected'));
+
+            // Add selection to clicked row
+            row.classList.add('selected');
+
+            // Get invoice number
+            const invoiceNumber = row.querySelector('.invoice-number').textContent;
+
+            // Update command line
+            const commandLine = document.querySelector('.command-line');
+            const selectMessage = document.createElement('div');
+            selectMessage.innerHTML = `<span style="color: #f4d03f;">► Selected invoice: ${invoiceNumber}</span>`;
+            commandLine.insertBefore(selectMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                commandLine.removeChild(selectMessage);
+            }, 3000);
+        }
+
+        // Create new invoice
+        function createInvoice() {
+            const commandLine = document.querySelector('.command-line');
+            const createMessage = document.createElement('div');
+            createMessage.innerHTML = '<span style="color: #f59e0b;">⚡ Creating new invoice...</span>';
+            commandLine.insertBefore(createMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                createMessage.innerHTML = '<span style="color: #10b981;">✓ Redirecting to invoice editor...</span>';
+                setTimeout(() => {
+                    commandLine.removeChild(createMessage);
+                }, 3000);
+            }, 1500);
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.table-row');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Status filter
+        document.getElementById('status-filter').addEventListener('change', function(e) {
+            const filterValue = e.target.value;
+            const rows = document.querySelectorAll('.table-row');
+
+            rows.forEach(row => {
+                const statusBadge = row.querySelector('.status-badge');
+                const status = statusBadge.textContent.toLowerCase();
+
+                if (filterValue === 'all' || status === filterValue) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Simulate real-time updates
+        function updateInvoiceStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                if (Math.random() < 0.1) {
+                    stat.style.color = '#3b82f6';
+                    setTimeout(() => {
+                        stat.style.color = '#f4d03f';
+                    }, 300);
+                }
+            });
+        }
+
+        setInterval(updateSessionTime, 1000);
+        setInterval(updateCurrentTime, 1000);
+        setInterval(updateInvoiceStats, 10000);
+
+        // Initialize
+        updateSessionTime();
+        updateCurrentTime();
+    </script>
+</body>
+</html>

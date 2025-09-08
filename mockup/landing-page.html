@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicer App - Open Source Invoice Management</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header {
+            background: #2a2a2a;
+            border-bottom: 2px solid #3a3a3a;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #f4d03f;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #e5e5e5;
+            text-decoration: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            color: #f4d03f;
+        }
+        
+        .btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary:hover {
+            background: #e6c236;
+        }
+        
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #f4d03f;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .hero-subtitle {
+            font-size: 20px;
+            color: #e5e5e5;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        
+        .hero-description {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+        
+        .terminal-demo {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .terminal-header {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .terminal-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #999;
+        }
+        
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #10b981; }
+        
+        .terminal-content {
+            padding: 24px;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+        
+        .command-line {
+            margin-bottom: 8px;
+        }
+        
+        .prompt {
+            color: #f4d03f;
+        }
+        
+        .command {
+            color: #e5e5e5;
+        }
+        
+        .output {
+            color: #10b981;
+            margin-left: 20px;
+        }
+        
+        .features {
+            padding: 80px 0;
+            background: #0f0f0f;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #f4d03f;
+            text-align: center;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: #f4d03f;
+            transform: translateY(-4px);
+        }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f4d03f;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .feature-description {
+            color: #999;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .installation {
+            padding: 80px 0;
+        }
+        
+        .install-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+        
+        .install-step {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 24px;
+            position: relative;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .step-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f4d03f;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .step-description {
+            color: #999;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 12px;
+            color: #10b981;
+            overflow-x: auto;
+        }
+        
+        .footer {
+            background: #0f0f0f;
+            border-top: 2px solid #3a3a3a;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .footer-link {
+            color: #999;
+            text-decoration: none;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.2s ease;
+        }
+        
+        .footer-link:hover {
+            color: #f4d03f;
+        }
+        
+        .footer-text {
+            color: #666;
+            font-size: 11px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-title {
+                font-size: 32px;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .install-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <div class="logo-icon">IA</div>
+                    INVOICER APP
+                </div>
+                
+                <div class="nav-links">
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#installation" class="nav-link">Installation</a>
+                    <a href="#docs" class="nav-link">Documentation</a>
+                    <a href="#github" class="nav-link">GitHub</a>
+                    <a href="login-page.html" class="btn btn-primary">Get Started</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1 class="hero-title">Invoicer App</h1>
+                <p class="hero-subtitle">Open Source Invoice Management System</p>
+                <p class="hero-description">
+                    A powerful invoice management application with a sleek terminal-inspired interface.
+                    Completely free, open source, and designed to run locally on your machine with full data control.
+                </p>
+                
+                <div class="hero-actions">
+                    <a href="login-page.html" class="btn btn-primary">Launch Application</a>
+                    <a href="#installation" class="btn">Download & Install</a>
+                </div>
+                
+                <div class="terminal-demo">
+                    <div class="terminal-header">
+                        <div class="terminal-title">INVOICER_APP_DEMO.SH</div>
+                        <div class="terminal-controls">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-content">
+                        <div class="command-line">
+                            <span class="prompt">user@localhost:~$</span> <span class="command">npm start</span>
+                        </div>
+                        <div class="output">✓ Starting Invoicer App v2.1.4...</div>
+                        <div class="output">✓ Database initialized successfully</div>
+                        <div class="output">✓ Web server running on http://localhost:3000</div>
+                        <div class="command-line">
+                            <span class="prompt">user@localhost:~$</span> <span class="command">open http://localhost:3000</span>
+                        </div>
+                        <div class="output">✓ Opening Invoicer App in browser...</div>
+                        <div class="output">✓ Dashboard loaded - 247 invoices, $127,450 total value</div>
+                        <div class="command-line">
+                            <span class="prompt">user@localhost:~$</span> <span class="command"># Ready to manage invoices!</span>
+                        </div>
+                        <div class="output">🎯 Create, send, track, and manage all your invoices</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <div class="container">
+                <h2 class="section-title">Features</h2>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🏠</div>
+                        <h3 class="feature-title">Self-Hosted</h3>
+                        <p class="feature-description">
+                            Run entirely on your local machine or server. No cloud dependencies,
+                            no monthly fees, complete data ownership and privacy control.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">Modern Interface</h3>
+                        <p class="feature-description">
+                            Beautiful retro terminal-inspired web interface that's both functional and
+                            aesthetically pleasing. Perfect for developers and tech enthusiasts.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Complete Solution</h3>
+                        <p class="feature-description">
+                            Full invoice lifecycle management: create, customize, send, track payments,
+                            manage clients, generate reports, and analyze business performance.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔓</div>
+                        <h3 class="feature-title">Open Source</h3>
+                        <p class="feature-description">
+                            MIT licensed, fully open source code. Contribute, customize,
+                            and extend the application to meet your specific business needs.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">💾</div>
+                        <h3 class="feature-title">Local Database</h3>
+                        <p class="feature-description">
+                            SQLite database for lightweight deployment or PostgreSQL for
+                            enterprise use. Your data stays on your infrastructure.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3 class="feature-title">Developer Friendly</h3>
+                        <p class="feature-description">
+                            RESTful API for integrations, webhook support for automation,
+                            and extensible architecture for connecting with other business systems.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="installation" id="installation">
+            <div class="container">
+                <h2 class="section-title">Quick Installation</h2>
+
+                <div class="install-steps">
+                    <div class="install-step">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Download</h3>
+                        <p class="step-description">
+                            Download the latest release from GitHub or clone the repository
+                            to get started with the source code.
+                        </p>
+                    </div>
+
+                    <div class="install-step">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Install</h3>
+                        <p class="step-description">
+                            Run the installation script or use npm/yarn to install
+                            dependencies and set up the application.
+                        </p>
+                    </div>
+
+                    <div class="install-step">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Configure</h3>
+                        <p class="step-description">
+                            Set up your company information, database connection,
+                            and email settings through the configuration wizard.
+                        </p>
+                    </div>
+
+                    <div class="install-step">
+                        <div class="step-number">4</div>
+                        <h3 class="step-title">Launch</h3>
+                        <p class="step-description">
+                            Start the web application and access the beautiful interface
+                            at localhost:3000 to begin creating and managing your invoices.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div># Clone the repository</div>
+                    <div>git clone https://github.com/invoicer-app/invoicer-app.git</div>
+                    <div></div>
+                    <div># Navigate to directory</div>
+                    <div>cd invoicer-app</div>
+                    <div></div>
+                    <div># Install dependencies</div>
+                    <div>npm install</div>
+                    <div></div>
+                    <div># Run setup wizard</div>
+                    <div>npm run setup</div>
+                    <div></div>
+                    <div># Start the application</div>
+                    <div>npm start</div>
+                    <div></div>
+                    <div># Access at http://localhost:3000</div>
+                </div>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="#" class="btn btn-primary">Download Latest Release</a>
+                    <a href="#" class="btn">View on GitHub</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <div class="logo-icon">IA</div>
+                    INVOICER APP
+                </div>
+
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Documentation</a>
+                    <a href="#" class="footer-link">GitHub</a>
+                    <a href="#" class="footer-link">Issues</a>
+                    <a href="#" class="footer-link">Contributing</a>
+                    <a href="#" class="footer-link">License</a>
+                </div>
+            </div>
+
+            <p class="footer-text">
+                © 2024 Invoicer App. Open source under MIT License.
+                Built with ❤️ for the developer community.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Terminal demo animation
+        function animateTerminal() {
+            const outputs = document.querySelectorAll('.output');
+            outputs.forEach((output, index) => {
+                setTimeout(() => {
+                    output.style.opacity = '0.5';
+                    setTimeout(() => {
+                        output.style.opacity = '1';
+                    }, 200);
+                }, index * 2000);
+            });
+        }
+
+        // Run terminal animation every 10 seconds
+        setInterval(animateTerminal, 10000);
+
+        // Feature cards hover effect
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 8px 32px rgba(244, 208, 63, 0.2)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

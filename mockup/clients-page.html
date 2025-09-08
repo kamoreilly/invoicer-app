@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicer App - Client Database</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+        
+        .header {
+            grid-area: header;
+            background: #2a2a2a;
+            border-bottom: 2px solid #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #f4d03f;
+        }
+        
+        .logo-icon {
+            width: 20px;
+            height: 20px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 10px;
+        }
+        
+        .terminal-info {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .status-indicator {
+            color: #10b981;
+        }
+        
+        .sidebar {
+            grid-area: sidebar;
+            background: #2a2a2a;
+            border-right: 2px solid #3a3a3a;
+            padding: 20px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-title {
+            padding: 0 20px 8px;
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            color: #e5e5e5;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-size: 12px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: #3a3a3a;
+            border-left-color: #f4d03f;
+            color: #f4d03f;
+        }
+        
+        .main {
+            grid-area: main;
+            padding: 24px;
+            background: #1a1a1a;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .terminal-time {
+            font-size: 11px;
+            color: #999;
+            font-family: inherit;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        
+        .btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary:hover {
+            background: #e6c236;
+        }
+        
+        .search-box {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 11px;
+            border-radius: 4px;
+            width: 250px;
+            margin-left: auto;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #f4d03f;
+            box-shadow: 0 0 0 1px #f4d03f;
+        }
+        
+        .terminal-window {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .terminal-header {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .terminal-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+        }
+        
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #10b981; }
+        
+        .terminal-content {
+            padding: 0;
+        }
+        
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table-header {
+            background: #3a3a3a;
+            color: #f4d03f;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 10px;
+        }
+        
+        .table-header th {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .table-row {
+            border-bottom: 1px solid #3a3a3a;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .table-row:hover {
+            background: #3a3a3a;
+        }
+        
+        .table-row td {
+            padding: 12px 16px;
+            font-size: 11px;
+        }
+        
+        .client-name {
+            color: #f4d03f;
+            font-weight: 600;
+        }
+        
+        .client-email {
+            color: #e5e5e5;
+        }
+        
+        .client-phone {
+            color: #999;
+        }
+        
+        .invoice-count {
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .total-amount {
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: #10b981;
+            color: #1a1a1a;
+        }
+        
+        .status-inactive {
+            background: #999;
+            color: #1a1a1a;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .btn-small {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 4px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+        
+        .btn-small:hover {
+            background: #4a4a4a;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 16px;
+            position: relative;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f4d03f;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f4d03f;
+            margin-bottom: 4px;
+        }
+        
+        .stat-meta {
+            font-size: 10px;
+            color: #10b981;
+        }
+        
+        .command-line {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 24px;
+        }
+        
+        .prompt {
+            color: #f4d03f;
+        }
+        
+        .cursor {
+            background: #f4d03f;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas: 
+                    "header"
+                    "main";
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .action-bar {
+                flex-wrap: wrap;
+            }
+            
+            .search-box {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-icon">IA</div>
+                    INVOICER_APP
+                </div>
+            </div>
+            
+            <div class="terminal-info">
+                <span>USER: admin</span>
+                <span>SESSION: <span id="session-time">14:32:07</span></span>
+                <span class="status-indicator">● ONLINE</span>
+            </div>
+        </header>
+        
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">// MAIN_MENU</div>
+                <a href="#" class="nav-item">► dashboard.exe</a>
+                <a href="#" class="nav-item">► invoices.db</a>
+                <a href="#" class="nav-item active">► clients.json</a>
+                <a href="#" class="nav-item">► payments.log</a>
+                <a href="#" class="nav-item">► reports.sql</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// SYSTEM_TOOLS</div>
+                <a href="#" class="nav-item">► config.ini</a>
+                <a href="#" class="nav-item">► backup.sh</a>
+                <a href="#" class="nav-item">► export.py</a>
+                <a href="#" class="nav-item">► analytics.r</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// ADMIN_PANEL</div>
+                <a href="#" class="nav-item">► users.admin</a>
+                <a href="#" class="nav-item">► security.cfg</a>
+                <a href="#" class="nav-item">► logs.txt</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="page-header">
+                <h1 class="page-title">CLIENT_DATABASE.JSON</h1>
+                <div class="terminal-time" id="current-time">2024-01-18 15:42:33 UTC</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL_CLIENTS</div>
+                    <div class="stat-value">247</div>
+                    <div class="stat-meta">+12 this_month</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">ACTIVE_CLIENTS</div>
+                    <div class="stat-value">189</div>
+                    <div class="stat-meta">76.5% active_rate</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL_REVENUE</div>
+                    <div class="stat-value">$892,450</div>
+                    <div class="stat-meta">lifetime_value</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">AVG_INVOICE_VALUE</div>
+                    <div class="stat-value">$3,614</div>
+                    <div class="stat-meta">per_client</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary">+ ADD_CLIENT</button>
+                <button class="btn">IMPORT_CSV</button>
+                <button class="btn">EXPORT_DATA</button>
+                <button class="btn">BULK_EMAIL</button>
+                <input type="text" class="search-box" placeholder="search clients..." id="client-search">
+            </div>
+
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-title">CLIENT_RECORDS.DB</div>
+                    <div class="terminal-controls">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                </div>
+
+                <div class="terminal-content">
+                    <table class="clients-table">
+                        <thead class="table-header">
+                            <tr>
+                                <th>CLIENT_NAME</th>
+                                <th>CONTACT_INFO</th>
+                                <th>INVOICES</th>
+                                <th>TOTAL_AMOUNT</th>
+                                <th>STATUS</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-list">
+                            <tr class="table-row" onclick="selectClient(this)">
+                                <td class="client-name">TechFlow Solutions Inc.</td>
+                                <td>
+                                    <div class="client-email">billing@techflow.com</div>
+                                    <div class="client-phone">(555) 123-4567</div>
+                                </td>
+                                <td class="invoice-count">23</td>
+                                <td class="total-amount">$89,450.00</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-small">EDIT</button>
+                                        <button class="btn-small">INVOICE</button>
+                                        <button class="btn-small">VIEW</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectClient(this)">
+                                <td class="client-name">Digital Ventures LLC</td>
+                                <td>
+                                    <div class="client-email">accounts@digitalventures.com</div>
+                                    <div class="client-phone">(555) 987-6543</div>
+                                </td>
+                                <td class="invoice-count">18</td>
+                                <td class="total-amount">$67,230.00</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-small">EDIT</button>
+                                        <button class="btn-small">INVOICE</button>
+                                        <button class="btn-small">VIEW</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectClient(this)">
+                                <td class="client-name">Global Dynamics Corp</td>
+                                <td>
+                                    <div class="client-email">finance@globaldynamics.com</div>
+                                    <div class="client-phone">(555) 456-7890</div>
+                                </td>
+                                <td class="invoice-count">31</td>
+                                <td class="total-amount">$124,780.00</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-small">EDIT</button>
+                                        <button class="btn-small">INVOICE</button>
+                                        <button class="btn-small">VIEW</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectClient(this)">
+                                <td class="client-name">Innovation Labs</td>
+                                <td>
+                                    <div class="client-email">billing@innovationlabs.io</div>
+                                    <div class="client-phone">(555) 321-0987</div>
+                                </td>
+                                <td class="invoice-count">12</td>
+                                <td class="total-amount">$45,670.00</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-small">EDIT</button>
+                                        <button class="btn-small">INVOICE</button>
+                                        <button class="btn-small">VIEW</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectClient(this)">
+                                <td class="client-name">StartupXYZ</td>
+                                <td>
+                                    <div class="client-email">admin@startupxyz.com</div>
+                                    <div class="client-phone">(555) 654-3210</div>
+                                </td>
+                                <td class="invoice-count">7</td>
+                                <td class="total-amount">$18,920.00</td>
+                                <td><span class="status-badge status-inactive">INACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-small">EDIT</button>
+                                        <button class="btn-small">INVOICE</button>
+                                        <button class="btn-small">VIEW</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row" onclick="selectClient(this)">
+                                <td class="client-name">MegaCorp Industries</td>
+                                <td>
+                                    <div class="client-email">procurement@megacorp.com</div>
+                                    <div class="client-phone">(555) 789-0123</div>
+                                </td>
+                                <td class="invoice-count">45</td>
+                                <td class="total-amount">$198,340.00</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-small">EDIT</button>
+                                        <button class="btn-small">INVOICE</button>
+                                        <button class="btn-small">VIEW</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="command-line">
+                <span class="prompt">invoicer@app-terminal:~$</span> client --list --active --sort=total_amount
+                <br>
+                <span style="color: #10b981;">✓ Found 189 active clients, sorted by total amount</span>
+                <br>
+                <span class="prompt">invoicer@app-terminal:~$</span> <span class="cursor">█</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update session time
+        function updateSessionTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const sessionElement = document.getElementById('session-time');
+            if (sessionElement) {
+                sessionElement.textContent = timeString;
+            }
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        // Select client row
+        function selectClient(row) {
+            // Remove previous selection
+            document.querySelectorAll('.table-row').forEach(r => r.style.background = '');
+            // Highlight selected row
+            row.style.background = '#3a3a3a';
+
+            const clientName = row.querySelector('.client-name').textContent;
+            const commandLine = document.querySelector('.command-line');
+            const selectMessage = document.createElement('div');
+            selectMessage.innerHTML = `<span style="color: #f4d03f;">► Selected client: ${clientName}</span>`;
+            commandLine.insertBefore(selectMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                commandLine.removeChild(selectMessage);
+            }, 3000);
+        }
+
+        // Search functionality
+        document.getElementById('client-search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#clients-list .table-row');
+
+            rows.forEach(row => {
+                const clientName = row.querySelector('.client-name').textContent.toLowerCase();
+                const clientEmail = row.querySelector('.client-email').textContent.toLowerCase();
+
+                if (clientName.includes(searchTerm) || clientEmail.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Simulate real-time updates
+        function updateClientStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                if (Math.random() < 0.05) {
+                    stat.style.color = '#3b82f6';
+                    setTimeout(() => {
+                        stat.style.color = '#f4d03f';
+                    }, 300);
+                }
+            });
+        }
+
+        setInterval(updateSessionTime, 1000);
+        setInterval(updateCurrentTime, 1000);
+        setInterval(updateClientStats, 5000);
+
+        // Initialize
+        updateSessionTime();
+        updateCurrentTime();
+    </script>
+</body>
+</html>

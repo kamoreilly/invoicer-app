@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicer App - User Administration</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+        
+        .header {
+            grid-area: header;
+            background: #2a2a2a;
+            border-bottom: 2px solid #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #f4d03f;
+        }
+        
+        .logo-icon {
+            width: 20px;
+            height: 20px;
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 10px;
+        }
+        
+        .terminal-info {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .status-indicator {
+            color: #10b981;
+        }
+        
+        .sidebar {
+            grid-area: sidebar;
+            background: #2a2a2a;
+            border-right: 2px solid #3a3a3a;
+            padding: 20px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-title {
+            padding: 0 20px 8px;
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 10px 20px;
+            color: #e5e5e5;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-size: 12px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: #3a3a3a;
+            border-left-color: #f4d03f;
+            color: #f4d03f;
+        }
+        
+        .main {
+            grid-area: main;
+            padding: 24px;
+            background: #1a1a1a;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .terminal-time {
+            font-size: 11px;
+            color: #999;
+            font-family: inherit;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        
+        .btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border-color: #f4d03f;
+        }
+        
+        .btn-primary:hover {
+            background: #e6c236;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .terminal-window {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .terminal-header {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .terminal-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+        }
+        
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #10b981; }
+        
+        .terminal-content {
+            padding: 20px;
+        }
+        
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 16px;
+            position: relative;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f4d03f;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f4d03f;
+            margin-bottom: 4px;
+        }
+        
+        .stat-meta {
+            font-size: 10px;
+            color: #10b981;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table-header {
+            background: #3a3a3a;
+            color: #f4d03f;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 10px;
+        }
+        
+        .table-header th {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        
+        .table-row {
+            border-bottom: 1px solid #3a3a3a;
+            transition: all 0.2s ease;
+        }
+        
+        .table-row:hover {
+            background: #3a3a3a;
+        }
+        
+        .table-row td {
+            padding: 12px 16px;
+            font-size: 11px;
+        }
+        
+        .user-name {
+            color: #f4d03f;
+            font-weight: 600;
+        }
+        
+        .user-email {
+            color: #e5e5e5;
+        }
+        
+        .user-role {
+            color: #999;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: #10b981;
+            color: #1a1a1a;
+        }
+        
+        .status-inactive {
+            background: #6b7280;
+            color: #ffffff;
+        }
+        
+        .status-suspended {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .action-btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 4px 8px;
+            font-family: inherit;
+            font-size: 9px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        
+        .action-btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .form-input {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #f4d03f;
+            box-shadow: 0 0 0 1px #f4d03f;
+        }
+        
+        .form-select {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            border-radius: 2px;
+        }
+        
+        .command-line {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 24px;
+        }
+        
+        .prompt {
+            color: #f4d03f;
+        }
+        
+        .cursor {
+            background: #f4d03f;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas: 
+                    "header"
+                    "main";
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .user-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .action-bar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-icon">IA</div>
+                    INVOICER_APP
+                </div>
+            </div>
+            
+            <div class="terminal-info">
+                <span>USER: admin</span>
+                <span>SESSION: <span id="session-time">14:32:07</span></span>
+                <span class="status-indicator">● ONLINE</span>
+            </div>
+        </header>
+        
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">// MAIN_MENU</div>
+                <a href="#" class="nav-item">► dashboard.exe</a>
+                <a href="#" class="nav-item">► invoices.db</a>
+                <a href="#" class="nav-item">► clients.json</a>
+                <a href="#" class="nav-item">► payments.log</a>
+                <a href="#" class="nav-item">► reports.sql</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// SYSTEM_TOOLS</div>
+                <a href="#" class="nav-item">► config.ini</a>
+                <a href="#" class="nav-item">► backup.sh</a>
+                <a href="#" class="nav-item">► export.py</a>
+                <a href="#" class="nav-item">► analytics.r</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">// ADMIN_PANEL</div>
+                <a href="#" class="nav-item active">► users.admin</a>
+                <a href="#" class="nav-item">► logout.cfg</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="page-header">
+                <h1 class="page-title">USER_ADMINISTRATION.ADMIN</h1>
+                <div class="terminal-time" id="current-time">2024-01-18 15:42:33 UTC</div>
+            </div>
+
+            <div class="user-stats">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL_USERS</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-meta">active_accounts</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">ADMIN_USERS</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-meta">full_access</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">LAST_LOGIN</div>
+                    <div class="stat-value">2h ago</div>
+                    <div class="stat-meta">user_activity</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">FAILED_LOGINS</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-meta">security_status</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="addUser()">ADD_USER</button>
+                <button class="btn">BULK_IMPORT</button>
+                <button class="btn">EXPORT_USERS</button>
+                <button class="btn">RESET_PASSWORDS</button>
+                <button class="btn btn-danger">PURGE_INACTIVE</button>
+            </div>
+
+            <!-- Add User Form -->
+            <div class="terminal-window" id="add-user-form" style="display: none;">
+                <div class="terminal-header">
+                    <div class="terminal-title">ADD_USER.FORM</div>
+                    <div class="terminal-controls">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                </div>
+
+                <div class="terminal-content">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">FULL_NAME</label>
+                            <input type="text" class="form-input" placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">EMAIL_ADDRESS</label>
+                            <input type="email" class="form-input" placeholder="user@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">USER_ROLE</label>
+                            <select class="form-select">
+                                <option value="user">USER - Standard Access</option>
+                                <option value="manager">MANAGER - Extended Access</option>
+                                <option value="admin">ADMIN - Full Access</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">DEPARTMENT</label>
+                            <select class="form-select">
+                                <option value="accounting">ACCOUNTING</option>
+                                <option value="sales">SALES</option>
+                                <option value="management">MANAGEMENT</option>
+                                <option value="it">IT_SUPPORT</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px;">
+                        <button class="btn" onclick="cancelAddUser()">CANCEL</button>
+                        <button class="btn btn-primary" onclick="saveUser()">CREATE_USER</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User List -->
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-title">USER_DATABASE.ADMIN</div>
+                    <div class="terminal-controls">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                </div>
+
+                <div class="terminal-content">
+                    <table class="user-table">
+                        <thead class="table-header">
+                            <tr>
+                                <th>USER_ID</th>
+                                <th>NAME</th>
+                                <th>EMAIL</th>
+                                <th>ROLE</th>
+                                <th>LAST_LOGIN</th>
+                                <th>STATUS</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-row">
+                                <td style="color: #f4d03f; font-weight: 600;">USR-001</td>
+                                <td class="user-name">John Administrator</td>
+                                <td class="user-email">john.admin@invoicerapp.com</td>
+                                <td class="user-role">ADMIN</td>
+                                <td style="color: #999;">2024-01-18 14:30</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">PERMISSIONS</button>
+                                        <button class="action-btn">SUSPEND</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td style="color: #f4d03f; font-weight: 600;">USR-002</td>
+                                <td class="user-name">Sarah Manager</td>
+                                <td class="user-email">sarah.manager@invoicerapp.com</td>
+                                <td class="user-role">MANAGER</td>
+                                <td style="color: #999;">2024-01-18 13:45</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">PERMISSIONS</button>
+                                        <button class="action-btn">SUSPEND</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td style="color: #f4d03f; font-weight: 600;">USR-003</td>
+                                <td class="user-name">Mike Accountant</td>
+                                <td class="user-email">mike.accountant@invoicerapp.com</td>
+                                <td class="user-role">USER</td>
+                                <td style="color: #999;">2024-01-18 12:20</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">PERMISSIONS</button>
+                                        <button class="action-btn">SUSPEND</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td style="color: #f4d03f; font-weight: 600;">USR-004</td>
+                                <td class="user-name">Lisa Sales</td>
+                                <td class="user-email">lisa.sales@invoicerapp.com</td>
+                                <td class="user-role">USER</td>
+                                <td style="color: #999;">2024-01-17 16:30</td>
+                                <td><span class="status-badge status-inactive">INACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">ACTIVATE</button>
+                                        <button class="action-btn">DELETE</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td style="color: #f4d03f; font-weight: 600;">USR-005</td>
+                                <td class="user-name">David Support</td>
+                                <td class="user-email">david.support@invoicerapp.com</td>
+                                <td class="user-role">USER</td>
+                                <td style="color: #999;">2024-01-18 11:15</td>
+                                <td><span class="status-badge status-active">ACTIVE</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">PERMISSIONS</button>
+                                        <button class="action-btn">SUSPEND</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td style="color: #f4d03f; font-weight: 600;">USR-006</td>
+                                <td class="user-name">Emma Finance</td>
+                                <td class="user-email">emma.finance@invoicerapp.com</td>
+                                <td class="user-role">MANAGER</td>
+                                <td style="color: #999;">2024-01-16 09:45</td>
+                                <td><span class="status-badge status-suspended">SUSPENDED</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">EDIT</button>
+                                        <button class="action-btn">REACTIVATE</button>
+                                        <button class="action-btn">DELETE</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="command-line">
+                <span class="prompt">invoicer@app-terminal:~$</span> SELECT * FROM users WHERE status='active' ORDER BY last_login DESC;
+                <br>
+                <span style="color: #10b981;">✓ Query executed successfully. 12 user accounts found.</span>
+                <br>
+                <span class="prompt">invoicer@app-terminal:~$</span> <span class="cursor">█</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update session time
+        function updateSessionTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const sessionElement = document.getElementById('session-time');
+            if (sessionElement) {
+                sessionElement.textContent = timeString;
+            }
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        // Add user functionality
+        function addUser() {
+            const form = document.getElementById('add-user-form');
+            form.style.display = 'block';
+
+            const commandLine = document.querySelector('.command-line');
+            const addMessage = document.createElement('div');
+            addMessage.innerHTML = '<span style="color: #f59e0b;">► Opening user creation form...</span>';
+            commandLine.insertBefore(addMessage, commandLine.lastElementChild);
+
+            setTimeout(() => {
+                commandLine.removeChild(addMessage);
+            }, 3000);
+        }
+
+        // Cancel add user
+        function cancelAddUser() {
+            const form = document.getElementById('add-user-form');
+            form.style.display = 'none';
+
+            // Clear form
+            form.querySelectorAll('input').forEach(input => input.value = '');
+            form.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+        }
+
+        // Save user
+        function saveUser() {
+            const form = document.getElementById('add-user-form');
+            const inputs = form.querySelectorAll('input, select');
+            let isValid = true;
+
+            // Basic validation
+            inputs.forEach(input => {
+                if (input.type !== 'submit' && !input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#ef4444';
+                } else {
+                    input.style.borderColor = '#3a3a3a';
+                }
+            });
+
+            if (isValid) {
+                const commandLine = document.querySelector('.command-line');
+                const saveMessage = document.createElement('div');
+                saveMessage.innerHTML = '<span style="color: #f59e0b;">⚡ Creating user account...</span>';
+                commandLine.insertBefore(saveMessage, commandLine.lastElementChild);
+
+                setTimeout(() => {
+                    saveMessage.innerHTML = '<span style="color: #10b981;">✓ User account created successfully. Welcome email sent.</span>';
+                    form.style.display = 'none';
+
+                    // Clear form
+                    inputs.forEach(input => input.value = '');
+
+                    setTimeout(() => {
+                        commandLine.removeChild(saveMessage);
+                    }, 5000);
+                }, 2000);
+            } else {
+                const commandLine = document.querySelector('.command-line');
+                const errorMessage = document.createElement('div');
+                errorMessage.innerHTML = '<span style="color: #ef4444;">✗ Please fill in all required fields.</span>';
+                commandLine.insertBefore(errorMessage, commandLine.lastElementChild);
+
+                setTimeout(() => {
+                    commandLine.removeChild(errorMessage);
+                }, 3000);
+            }
+        }
+
+        // Simulate user activity updates
+        function updateUserStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                if (Math.random() < 0.1) {
+                    stat.style.color = '#3b82f6';
+                    setTimeout(() => {
+                        stat.style.color = '#f4d03f';
+                    }, 300);
+                }
+            });
+        }
+
+        setInterval(updateSessionTime, 1000);
+        setInterval(updateCurrentTime, 1000);
+        setInterval(updateUserStats, 15000);
+
+        // Initialize
+        updateSessionTime();
+        updateCurrentTime();
+    </script>
+</body>
+</html>
