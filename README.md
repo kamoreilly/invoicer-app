@@ -1,6 +1,6 @@
-# invoicer
+# Invoicer App
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Hono, TRPC, and more.
+A powerful invoice management application with a sleek terminal-inspired interface.
 
 ## Features
 
