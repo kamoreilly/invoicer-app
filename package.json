@@ -8,22 +8,26 @@
   ],
   "scripts": {
     "check": "biome check --write .",
-    "dev": "turbo dev",
+    "dev": "node scripts/kill-dev-ports.js && turbo dev",
+    "dev:clean": "node scripts/kill-dev-ports.js",
+    "dev:clean:bun": "bun scripts/kill-dev-ports-bun.ts",
     "build": "turbo build",
     "check-types": "turbo check-types",
     "dev:native": "turbo -F native dev",
-    "dev:web": "turbo -F web dev",
-    "dev:server": "turbo -F server dev",
+    "dev:web": "node scripts/kill-dev-ports.js && turbo -F web dev",
+    "dev:server": "node scripts/kill-dev-ports.js && turbo -F server dev",
     "db:push": "turbo -F server db:push",
     "db:studio": "turbo -F server db:studio",
     "db:generate": "turbo -F server db:generate",
-    "db:migrate": "turbo -F server db:migrate"
+    "db:migrate": "turbo -F server db:migrate",
+    "db:seed": "cd apps/server && bun ../../scripts/seed-demo-users.ts"
   },
   "dependencies": {},
   "devDependencies": {
     "turbo": "^2.5.4",
     "@biomejs/biome": "2.2.2",
-    "ultracite": "5.3.3"
+    "ultracite": "5.3.3",
+    "kill-port": "^2.0.1"
   },
   "packageManager": "bun@1.2.21"
 }

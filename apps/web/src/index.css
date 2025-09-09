@@ -167,3 +167,19 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .border-l-3 {
+    border-left-width: 3px;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,417 @@
+/* Export page animations and styles */
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Export card animations */
+.export-card {
+  animation: fadeInUp 0.5s ease-out forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.export-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+.export-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+.export-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+.export-card:nth-child(4) {
+  animation-delay: 300ms;
+}
+.export-card:nth-child(5) {
+  animation-delay: 400ms;
+}
+.export-card:nth-child(6) {
+  animation-delay: 500ms;
+}
+
+.export-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(244, 208, 63, 0.1),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.export-card:hover::before {
+  left: 100%;
+}
+
+/* Export grid animations */
+.export-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.export-grid > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Format badge animations */
+.format-badge {
+  transition: all 0.2s ease-in-out;
+}
+
+.format-badge:hover {
+  transform: scale(1.05);
+  background-color: rgba(244, 208, 63, 0.2);
+}
+
+/* Progress bar animations */
+.export-progress .progress-bar {
+  transition: width 0.3s ease-in-out;
+}
+
+.export-progress .progress-fill {
+  animation: progressFill 0.5s ease-out;
+}
+
+/* Form animations */
+.export-form {
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.export-options {
+  animation: slideInFromRight 0.6s ease-out forwards;
+}
+
+/* Action button animations */
+.export-actions button {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.export-actions button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(244, 208, 63, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.export-actions button:hover::before {
+  left: 100%;
+}
+
+.export-actions button:active {
+  transform: scale(0.95);
+}
+
+/* Command line animations */
+.export-command-line {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.command-output {
+  animation: typewriter 1s steps(40, end);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.cursor-blink {
+  animation: blink 1s infinite;
+}
+
+/* Loading states */
+.export-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.export-loading .loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(244, 208, 63, 0.1),
+    transparent
+  );
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Success/error states */
+.export-success {
+  border-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.05);
+  animation: pulse 0.5s ease-in-out;
+}
+
+.export-error {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* Preview animations */
+.export-preview {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.export-preview pre {
+  transition: all 0.2s ease-in-out;
+}
+
+.export-preview:hover pre {
+  background-color: rgba(244, 208, 63, 0.05);
+}
+
+/* Terminal window animations */
+.terminal-window {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.terminal-window:nth-child(1) {
+  animation-delay: 0ms;
+}
+.terminal-window:nth-child(2) {
+  animation-delay: 200ms;
+}
+.terminal-window:nth-child(3) {
+  animation-delay: 400ms;
+}
+.terminal-window:nth-child(4) {
+  animation-delay: 600ms;
+}
+
+/* Option item animations */
+.export-option-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.export-option-item:hover {
+  transform: translateX(2px);
+  background-color: rgba(244, 208, 63, 0.05);
+  border-radius: 4px;
+  padding: 4px;
+  margin: -4px;
+}
+
+/* Filter animations */
+.filter-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.filter-item:hover {
+  transform: scale(1.02);
+}
+
+/* Responsive animations */
+@media (max-width: 768px) {
+  .export-card,
+  .export-form,
+  .export-options,
+  .terminal-window {
+    animation-delay: 0ms !important;
+  }
+
+  .export-form,
+  .export-options {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+}
+
+/* Focus states for accessibility */
+.export-focus-ring:focus {
+  outline: 2px solid #f4d03f;
+  outline-offset: 2px;
+}
+
+/* Hover effects */
+.export-hover-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.export-hover-effect::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(244, 208, 63, 0.1),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.export-hover-effect:hover::before {
+  left: 100%;
+}
+
+/* Staggered animations for lists */
+.stagger-animation > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.stagger-animation > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-animation > *:nth-child(2) {
+  animation-delay: 100ms;
+}
+.stagger-animation > *:nth-child(3) {
+  animation-delay: 200ms;
+}
+.stagger-animation > *:nth-child(4) {
+  animation-delay: 300ms;
+}
+.stagger-animation > *:nth-child(5) {
+  animation-delay: 400ms;
+}
+.stagger-animation > *:nth-child(6) {
+  animation-delay: 500ms;
+}
+
+/* Progress indicator specific animations */
+.progress-indicator {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-indicator::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* Download button animation */
+.download-button {
+  animation: pulse 2s infinite;
+}
+
+.download-button:hover {
+  animation: none;
+  transform: scale(1.05);
+}
+
+/* Status indicator animations */
+.status-indicator {
+  transition: all 0.3s ease-in-out;
+}
+
+.status-indicator.processing {
+  animation: pulse 1s infinite;
+}
+
+.status-indicator.success {
+  animation: pulse 0.5s ease-in-out;
+}
+
+.status-indicator.error {
+  animation: pulse 0.5s ease-in-out;
+}

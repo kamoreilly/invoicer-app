@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Admin Page Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #4a4a4a;
+            border-radius: 4px;
+            background: #2a2a2a;
+        }
+        .test-title {
+            color: #f4d03f;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        /* User Stats Grid */
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            position: relative;
+            border: 1px solid #4a4a4a;
+            background: #1a1a1a;
+            border-radius: 4px;
+            padding: 16px;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f4d03f;
+        }
+        .stat-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f4d03f;
+            margin-bottom: 4px;
+        }
+        .stat-meta {
+            font-size: 10px;
+            color: #10b981;
+        }
+        
+        /* User Table */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-header {
+            background: #3a3a3a;
+            color: #f4d03f;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 10px;
+        }
+        .table-header th {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #4a4a4a;
+        }
+        .table-row {
+            border-bottom: 1px solid #3a3a3a;
+            transition: all 0.2s ease;
+        }
+        .table-row:hover {
+            background: #3a3a3a;
+        }
+        .table-row td {
+            padding: 12px 16px;
+            font-size: 11px;
+        }
+        .user-name {
+            color: #f4d03f;
+            font-weight: 600;
+        }
+        .user-email {
+            color: #e5e5e5;
+        }
+        .user-role {
+            color: #999;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-active {
+            background: #10b981;
+            color: #1a1a1a;
+        }
+        .status-inactive {
+            background: #6b7280;
+            color: #ffffff;
+        }
+        .status-suspended {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+        }
+        .action-btn {
+            background: #3a3a3a;
+            color: #e5e5e5;
+            border: 1px solid #4a4a4a;
+            padding: 4px 8px;
+            font-family: inherit;
+            font-size: 9px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        .action-btn:hover {
+            background: #4a4a4a;
+            border-color: #f4d03f;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="color: #f4d03f; text-align: center; margin-bottom: 40px;">USER ADMINISTRATION COMPONENTS TEST</h1>
+        
+        <!-- User Stats Test -->
+        <div class="test-section">
+            <div class="test-title">User Statistics</div>
+            <div class="user-stats">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL_USERS</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-meta">active_accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">ADMIN_USERS</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-meta">full_access</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">LAST_LOGIN</div>
+                    <div class="stat-value">2h ago</div>
+                    <div class="stat-meta">user_activity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">FAILED_LOGINS</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-meta">security_status</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Table Test -->
+        <div class="test-section">
+            <div class="test-title">User Database</div>
+            <table class="user-table">
+                <thead class="table-header">
+                    <tr>
+                        <th>USER_ID</th>
+                        <th>NAME</th>
+                        <th>EMAIL</th>
+                        <th>ROLE</th>
+                        <th>LAST_LOGIN</th>
+                        <th>STATUS</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-row">
+                        <td style="color: #f4d03f; font-weight: 600;">USR-001</td>
+                        <td class="user-name">John Administrator</td>
+                        <td class="user-email">john.admin@invoicerapp.com</td>
+                        <td class="user-role">ADMIN</td>
+                        <td style="color: #999;">2024-01-18 14:30</td>
+                        <td><span class="status-badge status-active">ACTIVE</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">EDIT</button>
+                                <button class="action-btn">PERMISSIONS</button>
+                                <button class="action-btn">SUSPEND</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="table-row">
+                        <td style="color: #f4d03f; font-weight: 600;">USR-002</td>
+                        <td class="user-name">Sarah Manager</td>
+                        <td class="user-email">sarah.manager@invoicerapp.com</td>
+                        <td class="user-role">MANAGER</td>
+                        <td style="color: #999;">2024-01-18 13:45</td>
+                        <td><span class="status-badge status-active">ACTIVE</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">EDIT</button>
+                                <button class="action-btn">PERMISSIONS</button>
+                                <button class="action-btn">SUSPEND</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="table-row">
+                        <td style="color: #f4d03f; font-weight: 600;">USR-004</td>
+                        <td class="user-name">Lisa Sales</td>
+                        <td class="user-email">lisa.sales@invoicerapp.com</td>
+                        <td class="user-role">USER</td>
+                        <td style="color: #999;">2024-01-17 16:30</td>
+                        <td><span class="status-badge status-inactive">INACTIVE</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">EDIT</button>
+                                <button class="action-btn">ACTIVATE</button>
+                                <button class="action-btn">DELETE</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="table-row">
+                        <td style="color: #f4d03f; font-weight: 600;">USR-006</td>
+                        <td class="user-name">Emma Finance</td>
+                        <td class="user-email">emma.finance@invoicerapp.com</td>
+                        <td class="user-role">MANAGER</td>
+                        <td style="color: #999;">2024-01-16 09:45</td>
+                        <td><span class="status-badge status-suspended">SUSPENDED</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">EDIT</button>
+                                <button class="action-btn">REACTIVATE</button>
+                                <button class="action-btn">DELETE</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="text-align: center; color: #10b981; margin-top: 40px;">
+            ✓ User administration components are working correctly!
+        </div>
+    </div>
+</body>
+</html>

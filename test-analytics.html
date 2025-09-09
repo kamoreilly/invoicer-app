@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Page Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e5e5e5;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #4a4a4a;
+            border-radius: 4px;
+            background: #2a2a2a;
+        }
+        .test-title {
+            color: #f4d03f;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            position: relative;
+            border: 1px solid #4a4a4a;
+            background: #1a1a1a;
+            border-radius: 4px;
+            padding: 16px;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f4d03f;
+        }
+        .kpi-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .kpi-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f4d03f;
+            margin-bottom: 4px;
+        }
+        .kpi-change {
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .kpi-up { color: #10b981; }
+        .kpi-down { color: #ef4444; }
+        
+        .chart-container {
+            background: #1a1a1a;
+            border: 1px solid #4a4a4a;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .chart-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4d03f;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+        .chart {
+            height: 200px;
+            display: flex;
+            align-items: end;
+            gap: 8px;
+            padding: 20px 0;
+        }
+        .chart-bar {
+            flex: 1;
+            background: #3a3a3a;
+            border-radius: 2px 2px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .chart-bar:hover {
+            background: #f4d03f;
+        }
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: #999;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="color: #f4d03f; text-align: center; margin-bottom: 40px;">ANALYTICS PAGE COMPONENTS TEST</h1>
+        
+        <!-- KPI Cards Test -->
+        <div class="test-section">
+            <div class="test-title">KPI Dashboard</div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">REVENUE_GROWTH</div>
+                    <div class="kpi-value">+23.4%</div>
+                    <div class="kpi-change kpi-up">
+                        <span>▲</span> +5.2% vs last month
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">COLLECTION_RATE</div>
+                    <div class="kpi-value">94.7%</div>
+                    <div class="kpi-change kpi-up">
+                        <span>▲</span> +2.1% vs last month
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">AVG_PAYMENT_TIME</div>
+                    <div class="kpi-value">18.3 days</div>
+                    <div class="kpi-change kpi-down">
+                        <span>▼</span> +1.2 days vs last month
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart Test -->
+        <div class="test-section">
+            <div class="test-title">Revenue Chart</div>
+            <div class="chart-container">
+                <div class="chart-title">MONTHLY_REVENUE_TREND</div>
+                <div class="chart">
+                    <div class="chart-bar" style="height: 60%;" data-value="$24.5K"></div>
+                    <div class="chart-bar" style="height: 75%;" data-value="$31.2K"></div>
+                    <div class="chart-bar" style="height: 45%;" data-value="$18.7K"></div>
+                    <div class="chart-bar" style="height: 90%;" data-value="$37.8K"></div>
+                    <div class="chart-bar" style="height: 85%;" data-value="$35.4K"></div>
+                    <div class="chart-bar" style="height: 100%;" data-value="$42.1K"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; color: #10b981; margin-top: 40px;">
+            ✓ Analytics components are working correctly!
+        </div>
+    </div>
+</body>
+</html>

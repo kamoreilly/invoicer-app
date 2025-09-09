@@ -7,10 +7,14 @@ import { toast } from "sonner";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { AuthCard, AuthLayout, TerminalHistory } from "./layouts/auth-layout";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import {
+  TerminalField,
+  TerminalInput,
+  TerminalLabel,
+} from "./ui/terminal-input";
 
 export default function TerminalLoginForm() {
   const router = useRouter();
@@ -107,24 +111,10 @@ export default function TerminalLoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-landing-bg p-5 font-mono text-landing-text">
-      <div className="w-full max-w-[480px]">
-        {/* Header */}
-        <div className="mb-10 text-center">
-          <div className="mb-4 flex items-center justify-center gap-3 font-bold text-2xl text-landing-accent">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-landing-accent font-bold text-2xl text-landing-bg">
-              IA
-            </div>
-            INVOICER APP
-          </div>
-          <p className="mb-2 text-landing-text-muted text-sm">
-            Open Source Invoice Management
-          </p>
-          <p className="text-landing-text-dimmed text-xs uppercase tracking-wider">
-            Version 2.1.4 • Local Installation
-          </p>
-        </div>
+    <AuthLayout maxWidth="lg">
+      <TerminalHistory commands={commandHistory} />
 
+      <AuthCard showTerminalHeader title="LOGIN_TERMINAL.SH">
         {/* Command Line */}
         <div className="mb-6 rounded border border-landing-surface-alt bg-landing-bg-alt p-3 text-xs">
           <div className="space-y-1">
@@ -202,73 +192,47 @@ export default function TerminalLoginForm() {
                 form.handleSubmit();
               }}
             >
-              <div>
-                <form.Field name="username">
-                  {(field) => (
-                    <div className="space-y-2">
-                      <Label
-                        className="font-semibold text-landing-text-muted text-xs uppercase tracking-wider"
-                        htmlFor={field.name}
-                      >
-                        Username
-                      </Label>
-                      <Input
-                        autoComplete="username"
-                        className="border-landing-surface-alt bg-landing-bg text-landing-text placeholder:text-landing-text-dimmed focus:border-landing-accent focus:ring-landing-accent/20"
-                        id={field.name}
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="Enter your username"
-                        type="text"
-                        value={field.state.value}
-                      />
-                      {field.state.meta.errors.map((error) => (
-                        <p
-                          className="text-landing-error text-xs"
-                          key={error?.message}
-                        >
-                          {error?.message}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                </form.Field>
-              </div>
+              <form.Field name="username">
+                {(field) => (
+                  <TerminalField
+                    error={field.state.meta.errors[0]?.message}
+                    label="Username"
+                    required
+                  >
+                    <TerminalInput
+                      autoComplete="username"
+                      id={field.name}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="Enter your username"
+                      type="text"
+                      value={field.state.value}
+                    />
+                  </TerminalField>
+                )}
+              </form.Field>
 
-              <div>
-                <form.Field name="password">
-                  {(field) => (
-                    <div className="space-y-2">
-                      <Label
-                        className="font-semibold text-landing-text-muted text-xs uppercase tracking-wider"
-                        htmlFor={field.name}
-                      >
-                        Password
-                      </Label>
-                      <Input
-                        autoComplete="current-password"
-                        className="border-landing-surface-alt bg-landing-bg text-landing-text placeholder:text-landing-text-dimmed focus:border-landing-accent focus:ring-landing-accent/20"
-                        id={field.name}
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="Enter your password"
-                        type="password"
-                        value={field.state.value}
-                      />
-                      {field.state.meta.errors.map((error) => (
-                        <p
-                          className="text-landing-error text-xs"
-                          key={error?.message}
-                        >
-                          {error?.message}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                </form.Field>
-              </div>
+              <form.Field name="password">
+                {(field) => (
+                  <TerminalField
+                    error={field.state.meta.errors[0]?.message}
+                    label="Password"
+                    required
+                  >
+                    <TerminalInput
+                      autoComplete="current-password"
+                      id={field.name}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="Enter your password"
+                      type="password"
+                      value={field.state.value}
+                    />
+                  </TerminalField>
+                )}
+              </form.Field>
 
               <div className="flex items-center justify-between text-xs">
                 <form.Field name="rememberMe">
@@ -282,12 +246,12 @@ export default function TerminalLoginForm() {
                           field.handleChange(checked as boolean)
                         }
                       />
-                      <Label
-                        className="cursor-pointer text-landing-text-muted uppercase tracking-wider"
+                      <TerminalLabel
+                        className="cursor-pointer"
                         htmlFor={field.name}
                       >
                         Remember Me
-                      </Label>
+                      </TerminalLabel>
                     </div>
                   )}
                 </form.Field>
@@ -377,7 +341,7 @@ export default function TerminalLoginForm() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </AuthCard>
+    </AuthLayout>
   );
 }

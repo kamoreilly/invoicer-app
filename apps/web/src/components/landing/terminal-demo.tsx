@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 interface TerminalLine {
   type: "command" | "output";
   content: string;
@@ -35,21 +31,6 @@ const terminalLines: TerminalLine[] = [
 ];
 
 export default function TerminalDemo() {
-  const [visibleLines, setVisibleLines] = useState<number>(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setVisibleLines((prev) => {
-        if (prev >= terminalLines.length) {
-          return 0; // Reset animation
-        }
-        return prev + 1;
-      });
-    }, 800);
-
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <div className="mx-auto max-w-4xl overflow-hidden rounded-lg border border-landing-surface-alt bg-landing-surface">
       <div className="flex items-center justify-between border-landing-border border-b bg-landing-surface-alt px-4 py-3">
@@ -64,7 +45,7 @@ export default function TerminalDemo() {
       </div>
 
       <div className="p-6 font-mono text-xs leading-relaxed">
-        {terminalLines.slice(0, visibleLines).map((line, index) => (
+        {terminalLines.map((line, index) => (
           <div className="mb-2" key={index}>
             {line.type === "command" ? (
               <div className="flex">
@@ -77,11 +58,9 @@ export default function TerminalDemo() {
           </div>
         ))}
 
-        {visibleLines > 0 && visibleLines <= terminalLines.length && (
-          <div className="ml-5 flex">
-            <span className="h-4 w-2 animate-pulse bg-landing-accent" />
-          </div>
-        )}
+        <div className="ml-5 flex">
+          <span className="h-4 w-2 bg-landing-accent" />
+        </div>
       </div>
     </div>
   );

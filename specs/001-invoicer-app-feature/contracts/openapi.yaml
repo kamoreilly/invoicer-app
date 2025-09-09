@@ -1,0 +1,1442 @@
+openapi: 3.0.3
+info:
+  title: Invoicer App API
+  description: API for the Invoicer App - A comprehensive invoicing solution for small to medium businesses
+  version: 1.0.0
+  contact:
+    name: Invoicer App Team
+    email: support@invoicer.app
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.invoicer.app
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  # Client Management
+  /clients:
+    get:
+      tags:
+        - Clients
+      summary: List clients
+      description: Retrieve a paginated list of clients for the authenticated user
+      operationId: listClients
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search term for client name or email
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter by client status
+          schema:
+            type: string
+            enum: [active, inactive]
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [name, email, createdAt]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Client'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Clients
+      summary: Create client
+      description: Create a new client for the authenticated user
+      operationId: createClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClientRequest'
+      responses:
+        '201':
+          description: Client created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Client'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /clients/{id}:
+    get:
+      tags:
+        - Clients
+      summary: Get client
+      description: Retrieve a specific client by ID
+      operationId: getClient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Client ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Client'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Clients
+      summary: Update client
+      description: Update an existing client
+      operationId: updateClient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Client ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClientRequest'
+      responses:
+        '200':
+          description: Client updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Client'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Clients
+      summary: Delete client
+      description: Delete a client (soft delete)
+      operationId: deleteClient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Client ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Client deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Invoice Management
+  /invoices:
+    get:
+      tags:
+        - Invoices
+      summary: List invoices
+      description: Retrieve a paginated list of invoices for the authenticated user
+      operationId: listInvoices
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: clientId
+          in: query
+          description: Filter by client ID
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: Filter by invoice status
+          schema:
+            type: string
+            enum: [draft, sent, viewed, paid, overdue, cancelled, refunded]
+        - name: startDate
+          in: query
+          description: Filter by start date (ISO 8601 format)
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: Filter by end date (ISO 8601 format)
+          schema:
+            type: string
+            format: date
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [invoiceNumber, issueDate, dueDate, total, status]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invoice'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Invoices
+      summary: Create invoice
+      description: Create a new invoice
+      operationId: createInvoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceRequest'
+      responses:
+        '201':
+          description: Invoice created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /invoices/{id}:
+    get:
+      tags:
+        - Invoices
+      summary: Get invoice
+      description: Retrieve a specific invoice by ID with line items and payments
+      operationId: getInvoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Invoice ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/InvoiceDetail'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Invoices
+      summary: Update invoice
+      description: Update an existing invoice
+      operationId: updateInvoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Invoice ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceRequest'
+      responses:
+        '200':
+          description: Invoice updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/InvoiceDetail'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Invoices
+      summary: Delete invoice
+      description: Delete an invoice (soft delete)
+      operationId: deleteInvoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Invoice ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Invoice deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /invoices/{id}/send:
+    post:
+      tags:
+        - Invoices
+      summary: Send invoice
+      description: Send an invoice to the client via email
+      operationId: sendInvoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Invoice ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: Optional message to include with the invoice
+      responses:
+        '200':
+          description: Invoice sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  sentAt:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /invoices/{id}/payments:
+    get:
+      tags:
+        - Payments
+      summary: List invoice payments
+      description: Retrieve all payments for a specific invoice
+      operationId: listInvoicePayments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Invoice ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Payments
+  /payments:
+    post:
+      tags:
+        - Payments
+      summary: Create payment intent
+      description: Create a payment intent for online payment processing
+      operationId: createPaymentIntent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentIntentRequest'
+      responses:
+        '200':
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientSecret:
+                    type: string
+                    description: Stripe client secret for payment confirmation
+                  paymentIntentId:
+                    type: string
+                    description: Payment intent ID
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /payments/{id}/refund:
+    post:
+      tags:
+        - Payments
+      summary: Refund payment
+      description: Refund a successful payment
+      operationId: refundPayment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Payment ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  description: Amount to refund (optional, defaults to full amount)
+                  minimum: 0.01
+                reason:
+                  type: string
+                  description: Reason for refund
+                  enum: [duplicate, fraudulent, requested_by_customer, expired_uncaptured_charge]
+      responses:
+        '200':
+          description: Refund processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # File Attachments
+  /invoices/{id}/attachments:
+    get:
+      tags:
+        - Attachments
+      summary: List invoice attachments
+      description: Retrieve all attachments for a specific invoice
+      operationId: listInvoiceAttachments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Invoice ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceAttachment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Attachments
+      summary: Upload attachment
+      description: Upload a file attachment to an invoice
+      operationId: uploadAttachment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Invoice ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to upload (max 10MB)
+      responses:
+        '201':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/InvoiceAttachment'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '413':
+          description: Payload too large
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /invoices/{id}/attachments/{attachmentId}:
+    delete:
+      tags:
+        - Attachments
+      summary: Delete attachment
+      description: Delete a file attachment from an invoice
+      operationId: deleteAttachment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Invoice ID
+          schema:
+            type: string
+            format: uuid
+        - name: attachmentId
+          in: path
+          required: true
+          description: Attachment ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Attachment deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Currency Conversion
+  /currency/rates:
+    get:
+      tags:
+        - Currency
+      summary: Get exchange rates
+      description: Get current exchange rates for a base currency
+      operationId: getExchangeRates
+      parameters:
+        - name: base
+          in: query
+          description: Base currency code (ISO 4217)
+          schema:
+            type: string
+            pattern: '^[A-Z]{3}$'
+            default: USD
+        - name: targets
+          in: query
+          description: Comma-separated list of target currency codes
+          schema:
+            type: string
+            pattern: '^[A-Z]{3}(,[A-Z]{3})*$'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  base:
+                    type: string
+                  date:
+                    type: string
+                    format: date
+                  rates:
+                    type: object
+                    additionalProperties:
+                      type: number
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /currency/convert:
+    post:
+      tags:
+        - Currency
+      summary: Convert currency
+      description: Convert an amount from one currency to another
+      operationId: convertCurrency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - from
+                - to
+              properties:
+                amount:
+                  type: number
+                  description: Amount to convert
+                  minimum: 0.01
+                from:
+                  type: string
+                  description: Source currency code (ISO 4217)
+                  pattern: '^[A-Z]{3}$'
+                to:
+                  type: string
+                  description: Target currency code (ISO 4217)
+                  pattern: '^[A-Z]{3}$'
+                date:
+                  type: string
+                  description: Date for historical rate (ISO 8601 format, optional)
+                  format: date
+      responses:
+        '200':
+          description: Conversion successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: number
+                  from:
+                    type: string
+                  to:
+                    type: string
+                  rate:
+                    type: number
+                  convertedAmount:
+                    type: number
+                  date:
+                    type: string
+                    format: date
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Dashboard and Reports
+  /dashboard:
+    get:
+      tags:
+        - Dashboard
+      summary: Get dashboard data
+      description: Retrieve dashboard statistics and recent activity
+      operationId: getDashboard
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stats:
+                    type: object
+                    properties:
+                      totalInvoices:
+                        type: integer
+                      totalRevenue:
+                        type: number
+                      outstandingInvoices:
+                        type: integer
+                      outstandingAmount:
+                        type: number
+                      paidThisMonth:
+                        type: number
+                  recentInvoices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invoice'
+                  recentPayments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reports/revenue:
+    get:
+      tags:
+        - Reports
+      summary: Get revenue report
+      description: Generate revenue report for a date range
+      operationId: getRevenueReport
+      parameters:
+        - name: startDate
+          in: query
+          description: Start date (ISO 8601 format)
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date (ISO 8601 format)
+          schema:
+            type: string
+            format: date
+        - name: groupBy
+          in: query
+          description: Group results by period
+          schema:
+            type: string
+            enum: [day, week, month, year]
+            default: month
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                        revenue:
+                          type: number
+                        invoices:
+                          type: integer
+                        payments:
+                          type: integer
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Webhooks
+  /webhooks/stripe:
+    post:
+      tags:
+        - Webhooks
+      summary: Stripe webhook handler
+      description: Handle webhook events from Stripe
+      operationId: handleStripeWebhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed successfully
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Base schemas
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          maxLength: 100
+        postalCode:
+          type: string
+          maxLength: 20
+        country:
+          type: string
+          maxLength: 2
+          pattern: '^[A-Z]{2}$'
+
+    # Client schemas
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 2
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 50
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          default: USD
+        status:
+          type: string
+          enum: [active, inactive]
+          default: active
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        taxId:
+          type: string
+          maxLength: 100
+        notes:
+          type: string
+          maxLength: 1000
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateClientRequest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 50
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          default: USD
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        taxId:
+          type: string
+          maxLength: 100
+        notes:
+          type: string
+          maxLength: 1000
+
+    UpdateClientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 50
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        status:
+          type: string
+          enum: [active, inactive]
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        taxId:
+          type: string
+          maxLength: 100
+        notes:
+          type: string
+          maxLength: 1000
+
+    # Invoice schemas
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+          maxLength: 50
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [draft, sent, viewed, paid, overdue, cancelled, refunded]
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          default: USD
+        subtotal:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        taxRate:
+          type: number
+          minimum: 0
+          maximum: 100
+          multipleOf: 0.01
+        taxAmount:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        total:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        notes:
+          type: string
+          maxLength: 1000
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        paidAt:
+          type: string
+          format: date-time
+        client:
+          $ref: '#/components/schemas/Client'
+
+    InvoiceDetail:
+      allOf:
+        - $ref: '#/components/schemas/Invoice'
+        - type: object
+          properties:
+            lineItems:
+              type: array
+              items:
+                $ref: '#/components/schemas/LineItem'
+            payments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Payment'
+            attachments:
+              type: array
+              items:
+                $ref: '#/components/schemas/InvoiceAttachment'
+
+    CreateInvoiceRequest:
+      type: object
+      required:
+        - clientId
+        - lineItems
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          default: USD
+        notes:
+          type: string
+          maxLength: 1000
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateLineItemRequest'
+
+    UpdateInvoiceRequest:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        notes:
+          type: string
+          maxLength: 1000
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateLineItemRequest'
+
+    # Line item schemas
+    LineItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        description:
+          type: string
+          minLength: 1
+          maxLength: 500
+        quantity:
+          type: number
+          minimum: 0.000001
+          multipleOf: 0.000001
+        unitPrice:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        amount:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        taxRate:
+          type: number
+          minimum: 0
+          maximum: 100
+          multipleOf: 0.01
+        taxAmount:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        sortOrder:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateLineItemRequest:
+      type: object
+      required:
+        - description
+        - quantity
+        - unitPrice
+      properties:
+        description:
+          type: string
+          minLength: 1
+          maxLength: 500
+        quantity:
+          type: number
+          minimum: 0.000001
+          multipleOf: 0.000001
+        unitPrice:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        taxRate:
+          type: number
+          minimum: 0
+          maximum: 100
+          multipleOf: 0.01
+        sortOrder:
+          type: integer
+          minimum: 0
+
+    # Payment schemas
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          minimum: 0.01
+          multipleOf: 0.01
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        paymentMethod:
+          type: string
+          enum: [stripe_card, stripe_bank_transfer, paypal, bank_transfer, cash, check, other]
+        providerTransactionId:
+          type: string
+          maxLength: 255
+        status:
+          type: string
+          enum: [pending, processing, succeeded, failed, refunded, cancelled]
+        failureReason:
+          type: string
+          maxLength: 500
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+
+    CreatePaymentIntentRequest:
+      type: object
+      required:
+        - invoiceId
+        - paymentMethod
+      properties:
+        invoiceId:
+          type: string
+          format: uuid
+        paymentMethod:
+          type: string
+          enum: [stripe_card, paypal]
+        amount:
+          type: number
+          minimum: 0.01
+          multipleOf: 0.01
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+
+    # Attachment schemas
+    InvoiceAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        fileKey:
+          type: string
+          maxLength: 1000
+        originalFilename:
+          type: string
+          maxLength: 255
+        fileSize:
+          type: integer
+          minimum: 1
+        contentType:
+          type: string
+          maxLength: 100
+        uploadedAt:
+          type: string
+          format: date-time
+
+    # Error response schemas
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+            timestamp:
+              type: string
+              format: date-time
+
+  responses:
+    BadRequestError:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFoundError:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ConflictError:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+tags:
+  - name: Clients
+    description: Client management endpoints
+  - name: Invoices
+    description: Invoice management endpoints
+  - name: Payments
+    description: Payment processing endpoints
+  - name: Attachments
+    description: File attachment endpoints
+  - name: Currency
+    description: Currency conversion endpoints
+  - name: Dashboard
+    description: Dashboard and statistics endpoints
+  - name: Reports
+    description: Report generation endpoints
+  - name: Webhooks
+    description: Webhook handler endpoints
