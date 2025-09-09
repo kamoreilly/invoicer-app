@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Header from "@/components/header";
 
-const landingPaths = ["/", "/landing"];
+const landingPaths = ["/", "/landing", "/login"];
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
   const isLandingPage = landingPaths.includes(pathname);
 
-  // For landing pages, the layout is handled within the PageTemplate component
+  // For landing pages and login page, the layout is handled within their respective components
   if (isLandingPage) {
     return <>{children}</>;
   }
